@@ -34,8 +34,9 @@ void InitApp(void)
     //Set C bits to output
     TRISC = 0x00;
 
-    //Set B to output
-    TRISB = 0x00;
+    //B5 is the IR Lead
+    TRISB &= 0b11011111;
+
     /* Setup analog functionality and port direction */
 
     /* Initialize peripherals */
@@ -43,6 +44,35 @@ void InitApp(void)
     /* Configure the IPEN bit (1=on) in RCON to turn on/off int priorities */
 
     /* Enable interrupts */
+
+    //interrupt testing
+    INTCONbits.TMR0IF = 0;
+    PIR1bits.TMR1IF = 0;
+    T0CONbits.T08BIT = 0;
+    
+    T1CONbits.TMR1CS1 = 0;
+    //T1CONbits
+    T1CONbits.T1CKPS = 0b01;
+    //T1CONbits.T1RUN = 0;
+
+    T0CONbits.T0PS = 0b00;
+    T0CONbits.T0CS = 0;
+    T0CONbits.PSA = 0; //turn scalar off
+
+    RCONbits.IPEN = 1;
+    INTCON2bits.TMR0IP = 1;
+    //RCON |= 0b10000000;     //enable priority interrupts
+    //INTCON |= 0b10000000;   //enable high priority interrupts
+    //INTCON |= 0b01000000;   //enable low priority interrupts
+    INTCONbits.TMR0IE = 1;
+    PIE1bits.TMR1IE = 1;
+    INTCONbits.PEIE = 1;
+    INTCONbits.GIE = 1; //enable global interrupt
+    IPR1bits.TMR1IP = 1;
+
+
+    T0CONbits.TMR0ON = 0; //turn on timer 0
+    T1CONbits.TMR1ON = 0; //turn on timer 1
 }
 
 

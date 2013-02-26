@@ -26,6 +26,8 @@
 
 #define BUZZ 0
 
+
+void IdleLoop(void);
 void Test_LED_Buzz();
 void Buzz_Test();
 /******************************************************************************/
@@ -36,6 +38,7 @@ void Buzz_Test();
 /* Main Program                                                               */
 /******************************************************************************/
 
+
 void main(void)
 {
     /* Configure the oscillator for the device */
@@ -43,27 +46,34 @@ void main(void)
 
     /* Initialize I/O and Peripherals for application */
     InitApp();
-
-    //interrupt testing
-    RCON |= 0b10000000;     //enable priority interrupts
-    INTCON |= 0b10000000;   //enable high priority interrupts
-    INTCON |= 0b01000000;   //enable low priority interrupts
-
-    //Bit 1 of port A starts it off
-    PORTA = 0x01;
-
-    //C port is off
-    PORTC = 0x00;
-
-
+    
+    //IdleLoop();
     Test_LED_Buzz();
     //Buzz_Test();
+}
+
+void IdleLoop()
+{
+    while(1)
+    {
+        PORTA |= 0x01;
+    }
 }
 
 void Test_LED_Buzz()
 {
   unsigned int i = 0;
   char pA = 0x01, pC = 0x01;
+
+  //Bit 1 of port A starts it off
+  PORTA = 0x01;
+
+  //turn on IR
+  //PORTB |= 0b00100000;
+
+  //C port is off
+  PORTC = 0x00;
+    
     while(1)
     {
        if(i>700)
@@ -119,6 +129,7 @@ void Test_LED_Buzz()
 void Buzz_Test()
 {
     unsigned int i = 0, j = 0;
+    TRISBbits.TRISB3 = 0;
     while(1)
     {
         if(i > j++)

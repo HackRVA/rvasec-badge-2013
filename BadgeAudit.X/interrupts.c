@@ -21,6 +21,11 @@
 /* Interrupt Routines                                                         */
 /******************************************************************************/
 
+void Test_InterruptRoutinge(void)
+{
+    PORTC |= 0x01;
+}
+
 /* High-priority service */
 
 #if defined(__XC) || defined(HI_TECH_C)
@@ -34,39 +39,50 @@ void high_isr(void)
 #endif
 
 {
-
       /* This code stub shows general interrupt handling.  Note that these
       conditional statements are not handled within 3 seperate if blocks.
       Do not use a seperate if block for each interrupt flag to avoid run
       time errors. */
-
-#if 0
+#if 1
     
       /* TODO Add High Priority interrupt routine code here. */
 
       /* Determine which flag generated the interrupt */
-      if(<Interrupt Flag 1>)
+      if(INTCONbits.TMR0IF)
       {
-          <Interrupt Flag 1=0>; /* Clear Interrupt Flag 1 */
+          //jump to some function
+          Test_InterruptRoutinge();
+
+          //clear interrupt bit
+          INTCONbits.TMR0IF = 0; /* Clear Interrupt Flag 1 */
       }
-      else if (<Interrupt Flag 2>)
+      else if (PIR1bits.TMR1IF)
       {
-          <Interrupt Flag 2=0>; /* Clear Interrupt Flag 2 */
+          Test_InterruptRoutinge();
+          INTCONbits.TMR0IF = 1; /* Clear Interrupt Flag 2 */
       }
       else
       {
           /* Unhandled interrupts */
       }
-
 #endif
-
 }
+
+//#pragma code MyTestInterrupt=0x08
+//void MyTestInterrupt(void)
+//{
+//    _asm
+//    gotol
+//    _endasm
+//}
+#if 0
 
 /* Low-priority interrupt routine */
 #if defined(__XC) || defined(HI_TECH_C)
 void low_priority interrupt low_isr(void)
 #elif defined (__18CXX)
-#pragma code low_isr=0x18
+//#pragma code low_isr=0x18
+#pragma code low_isr=0x22
 #pragma interruptlow low_isr
 void low_isr(void)
 #else
@@ -100,3 +116,4 @@ void low_isr(void)
 #endif
 
 }
+#endif
