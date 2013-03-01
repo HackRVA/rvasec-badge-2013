@@ -8,7 +8,7 @@
 #elif defined(__18CXX)
     #include <p18cxxx.h>   /* C18 General Include File */
 #endif
-
+//#include <p18f2455.h>
 #if defined(__XC) || defined(HI_TECH_C)
 
 #include <stdint.h>        /* For uint8_t definition */
@@ -16,47 +16,51 @@
 
 #endif
 
-#pragma config WDTEN = OFF
+#pragma config WDT = OFF                 //Watch Dog Timer off
 #pragma config DEBUG = OFF
-//#pragma config FOSC = INTOSCIO_EC
+#pragma config CPUDIV = OSC1_PLL2        //Post Scalar:96MHz/2 = 48MHz
+#pragma config FOSC = HSPLL_HS           //HS Crystal, Phase-Locked Loop
 
 #include "system.h"        /* System funct/params, like osc/peripheral config */
 #include "user.h"          /* User funct/params, such as InitApp */
-#include <delays.h>
 
 #define BUZZ 0
-
 
 void IdleLoop(void);
 void Test_LED_Buzz();
 void Buzz_Test();
-/******************************************************************************/
-/* User Global Variable Declaration                                           */
-/******************************************************************************/
-
-/******************************************************************************/
-/* Main Program                                                               */
-/******************************************************************************/
+void IR_Test();
 
 
 void main(void)
 {
-    /* Configure the oscillator for the device */
+    //Configure Oscillator
     ConfigureOscillator();
 
-    /* Initialize I/O and Peripherals for application */
+    //Init function
     InitApp();
     
     //IdleLoop();
     Test_LED_Buzz();
+    //IR_Test();
     //Buzz_Test();
+
+}
+void IR_Test()
+{
+    LATBbits.LATB5 = 1;
+    while(1)
+    {
+        LATAbits.LATA0 = ~LATAbits.LATA0;
+    }
 }
 
 void IdleLoop()
 {
+    PORTA |= 0x01;
     while(1)
     {
-        PORTA |= 0x01;
+        
     }
 }
 
@@ -76,7 +80,7 @@ void Test_LED_Buzz()
     
     while(1)
     {
-       if(i>700)
+       if(i>7000)
        {
             //last port a was LED on
             if(pA == 0x40)
@@ -92,7 +96,7 @@ void Test_LED_Buzz()
                     pC = 0x01;
 
                     //toggle status led
-                    LATCbits.LATC2 = ~LATCbits.LATC2;
+                    //LATCbits.LATC2 = ~LATCbits.LATC2;
 
                     //Mask to only leave the status bit
                     PORTC &= 0x04;

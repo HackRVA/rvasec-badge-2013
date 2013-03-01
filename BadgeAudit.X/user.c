@@ -27,7 +27,6 @@
 
 void InitApp(void)
 {
-    /* TODO Initialize User Ports/Peripherals/Project here */
     //Set A bits to output
     TRISA = 0x00;
 
@@ -37,44 +36,37 @@ void InitApp(void)
     //B5 is the IR Lead
     TRISB &= 0b11011111;
 
-    /* Setup analog functionality and port direction */
-
-    /* Initialize peripherals */
-
-    /* Configure the IPEN bit (1=on) in RCON to turn on/off int priorities */
-
-    /* Enable interrupts */
+    //Outputs off
+    PORTA = 0x00;
+    PORTC = 0x00;
+    PORTB = 0x00;
 
     //interrupt testing
-    INTCONbits.TMR0IF = 0;
-    PIR1bits.TMR1IF = 0;
-    T0CONbits.T08BIT = 0;
-    
-    T1CONbits.TMR1CS1 = 0;
-    //T1CONbits
-    T1CONbits.T1CKPS = 0b01;
-    //T1CONbits.T1RUN = 0;
+    INTCONbits.TMR0IF = 0;          //Clear timer 0 flag
+    PIR1bits.TMR1IF = 0;            //Clear time 1 flag
 
-    T0CONbits.T0PS = 0b00;
-    T0CONbits.T0CS = 0;
-    T0CONbits.PSA = 0; //turn scalar off
+    RCONbits.IPEN = 1;              //Interrupt priority enable (0 = off)
 
-    RCONbits.IPEN = 1;
-    INTCON2bits.TMR0IP = 1;
-    //RCON |= 0b10000000;     //enable priority interrupts
-    //INTCON |= 0b10000000;   //enable high priority interrupts
-    //INTCON |= 0b01000000;   //enable low priority interrupts
-    INTCONbits.TMR0IE = 1;
-    PIE1bits.TMR1IE = 1;
-    INTCONbits.PEIE = 1;
-    INTCONbits.GIE = 1; //enable global interrupt
-    IPR1bits.TMR1IP = 1;
+    //Timer 0 setup
+    INTCONbits.TMR0IE = 1;          //Enable Timer 0
+    T0CONbits.T08BIT = 0;           //timer 0 set to 16 bit (1 = 8 bit)
+    T0CONbits.T0PS = 0b00;          //Timer 0 Prescalar select (0b00 = 1:2)
+    T0CONbits.T0CS = 0;             //Timer 0 source select (0 = inter inst. clk
+    T0CONbits.PSA = 0;              //Timer 0 turn scalar off
+    INTCON2bits.TMR0IP = 1;         //Timer 0 interrupt priority (1 = high)
 
+    //Timer 1 setup
+    //T1CONbits.TMR1CS1 = 0;        //Timer 1, external or internal osc
+    T1CONbits.T1CKPS = 0b01;        //Timer 1 Prescalar Select (0b01 = 1:2)
+    IPR1bits.TMR1IP = 1;            //Timer 1 overflow priority
+    PIE1bits.TMR1IE = 1;            //Enable timer 1 overflow interrupt
 
-    T0CONbits.TMR0ON = 0; //turn on timer 0
-    T1CONbits.TMR1ON = 0; //turn on timer 1
+    INTCONbits.PEIE = 1;            //Peripheral interrupt enable
+    INTCONbits.GIE = 1;             //enable global interrupt
+
+    T0CONbits.TMR0ON = 1;           //turn on timer 0
+    T1CONbits.TMR1ON = 0;           //turn on timer 1
 }
-
 
 
 void long_delay(unsigned int amount, unsigned int multiplier)
@@ -84,8 +76,6 @@ void long_delay(unsigned int amount, unsigned int multiplier)
     {
         my_delay(amount);
     }
-
-
 }
 void my_delay(unsigned int amount)
 {

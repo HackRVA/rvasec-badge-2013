@@ -23,8 +23,12 @@
 
 void Test_InterruptRoutinge(void)
 {
-    PORTC |= 0x01;
+    //PORTC |= 0x01;
+    //LATBbits.LATB5 = ~LATBbits.LATB5;
+    LATCbits.LATC2 = ~LATCbits.LATC2;
 }
+
+unsigned int count = 0;
 
 /* High-priority service */
 
@@ -44,22 +48,26 @@ void high_isr(void)
       Do not use a seperate if block for each interrupt flag to avoid run
       time errors. */
 #if 1
-    
       /* TODO Add High Priority interrupt routine code here. */
 
       /* Determine which flag generated the interrupt */
       if(INTCONbits.TMR0IF)
       {
-          //jump to some function
-          Test_InterruptRoutinge();
+          count++;
 
+          if(count>100)
+          {
+              count = 0;
+            //jump to some function
+            Test_InterruptRoutinge();
+          }
           //clear interrupt bit
           INTCONbits.TMR0IF = 0; /* Clear Interrupt Flag 1 */
       }
       else if (PIR1bits.TMR1IF)
       {
-          Test_InterruptRoutinge();
-          INTCONbits.TMR0IF = 1; /* Clear Interrupt Flag 2 */
+          //Test_InterruptRoutinge();
+         // INTCONbits.TM /* Clear Interrupt Flag 2 */
       }
       else
       {
