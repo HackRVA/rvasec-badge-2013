@@ -2,6 +2,8 @@
  * RVAsec Badge Audit
  */
 #include <p18f2455.h>
+#include <i2c.h>
+#include <delays.h>
 #include <stdio.h>              //needed for printf, may remove to save space
 
 #pragma config WDT = OFF                 //Watch Dog Timer off
@@ -22,9 +24,10 @@
 //===========
 //Prototypes
 //===========
-void tmr0_toggleStatus(void);
+void tmr0_routine(void);
 void highIntHandle(void);
 void lowIntHandle(void);
+void check_accel(void);
 
 //===========
 //Interrupt Vectors
@@ -43,8 +46,13 @@ void low_isr(void)
 
 
 //===========
-//Globals
+//Globals and Defines
 //===========
+#define idle 0
+#define ir_respond 1
+
+unsigned short badge_id = 0;        //identify badges, 0 is test program
+unsigned char state_id = 0;
 unsigned char status_count = 0;
 
 
@@ -57,7 +65,7 @@ void highIntHandle(void)
       if(INTCONbits.TMR0IF)
       {
           //jump to some function
-          tmr0_toggleStatus();
+          tmr0_routine();
 
           //clear interrupt flag
           INTCONbits.TMR0IF = 0;
@@ -78,12 +86,12 @@ void lowIntHandle(void)
 
 }
 
-void tmr0_toggleStatus(void)
+void tmr0_routine(void)
 {
-    status_count += 1;
-
-    if(!status_count)
-        LATCbits.LATC2 = ~LATCbits.LATC2;
+//    status_count += 1;
+//
+//    if(!status_count)
+//        LATCbits.LATC2 = ~LATCbits.LATC2;
 }
 
 
@@ -103,6 +111,8 @@ void setup(void)
     TRISC &= 0b11111000;    //Last two Green LED and Red Status
     PORTC &= 0b11111000;    //C port LEDs OFF
 
+    LATCbits.LATC2 = 1;     //turn on red status LED
+    
     //--------------------------
     //Setup Serial Communication
     //--------------------------
@@ -148,8 +158,35 @@ void setup(void)
     INTCONbits.PEIE = 1;            //Peripheral interrupt enable
     INTCONbits.GIE = 1;             //enable global interrupt
 
+    TMR0L = 0;                      //Timer 0 counts up from 0
+    TMR0H = 0;
+
+    TMR1L = 0;                      //Timer 1 counts up from 0
+    TMR1H = 0;
+
     T0CONbits.TMR0ON = 1;           //turn on timer 0
     T1CONbits.TMR1ON = 0;           //turn on timer 1
+
+    //-------------------
+    //Setup I2C
+    //-------------------
+    //TRISB |= 0x03;                  //B0 and B1 must be inputs
+    SSPADD = 0x7F;                  //127
+    OpenI2C(MASTER, SLEW_OFF);      //Init I2C module
+
+    printf("Configuring I2C\n\r");
+    StartI2C();
+        IdleI2C();
+    WriteI2C(0x98);             //announse address (accel is 0x98?)
+        IdleI2C();
+    WriteI2C(0x07);             //select the mode register
+        IdleI2C();
+    WriteI2C(0x01);             //Place in active mode
+        IdleI2C();
+    StopI2C();
+
+    //Print a welcome message in case someone plugs it up
+    printf("Welcome to the RVAsec Badge!\n\r\n\r");
 }
 
 void main(void)
@@ -160,6 +197,35 @@ void main(void)
     //main loop
     while(1)
     {
+        switch(state_id)
+        {
+            case (idle):
+            {
+                check_accel();
+                break;
+            }
+
+            case(ir_respond):
+            {
+                break;
+            }
+        }
         printf("Hello World!!\n\r");
     }
+}
+
+void check_accel(void)
+{
+    unsigned char result;
+
+    StartI2C();
+        IdleI2C();
+    WriteI2C(0x98);
+        IdleI2C();
+    WriteI2C(0x00);
+
+    result = ReadI2C();
+    Delay1KTCYx(2);
+    printf("Result from I2C: %u\n\n\n\r", (unsigned int)result);
+    Delay10KTCYx(20);
 }
