@@ -32,6 +32,7 @@ void lowIntHandle(void);
 void check_accel(void);
 void activate_shake_det(void);
 void check_shake(void);
+
 //===========
 //Interrupt Vectors
 //===========
@@ -61,7 +62,7 @@ unsigned char state_id = 0;
 unsigned char status_count = 0;
 
 //Accel vectors
-unsigned char xA, yA, zA;
+unsigned char xA, yA, zA, shake_tilt;
 
 //===========
 //Interrupt handler routines
@@ -77,24 +78,27 @@ void highIntHandle(void)
           //clear interrupt flag
           INTCONbits.TMR0IF = 0;
       }
-      else if (PIR1bits.TMR1IF)
+      else if (INTCON3bits.INT2IF)//(PIR1bits.TMR1IF)
       {
-
+            LATAbits.LATA1 = 1;
       }
       else
       {
 
       }
+      
 }
 
 #pragma interruptlow lowIntHandle
 void lowIntHandle(void)
 {
-    if(INTCON3 & 0b00000010) //check for INT2 (B2-Accel INT)
+    if(INTCON3bits.INT2IF) //check for INT2 (B2-Accel INT)
     {
-
-         INTCON3 = 0b00010000;  //re enable 
+         check_shake();
+         //INTCON3 = 0b00010000;  //re enable
+         INTCON3bits.INT2IF = 0;  //clear flag
     }
+    LATAbits.LATA0 = 1;
 }
 
 void tmr0_routine(void)
@@ -105,8 +109,6 @@ void tmr0_routine(void)
 //        LATCbits.LATC2 = ~LATCbits.LATC2;
 }
 
-
-char tmr0_state = 0x01; //piezo
 
 void main(void)
 {
@@ -120,7 +122,16 @@ void main(void)
         {
             case (idle):
             {
-                check_accel();
+                if(INTCON3bits.INT2IF)
+                {
+                    printf("INTERRUPT DETECTED!\n\r");
+                    INTCON3bits.INT2IF = 0;
+                    INTCON3bits.INT2IE = 1;
+                    check_shake();
+                }
+
+               // Delay10KTCYx(10);
+                //check_accel();
                 break;
             }
 
@@ -191,7 +202,19 @@ void check_accel(void)
 
 void check_shake(void)
 {
-    
+    printf("Shake detected!!\n\r");
+    StartI2C();
+
+        //Tell Badge we want X axis
+        WriteI2C(Accel_Write_Addr);
+        WriteI2C(0x03);
+        
+    RestartI2C();
+
+        //Get the X axis
+        WriteI2C(Accel_Read_Addr);
+        shake_tilt = ReadI2C();
+
 }
 
 void activate_shake_det(void)

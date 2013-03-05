@@ -12,6 +12,7 @@ void led_setup(void)
     PORTC &= 0b11111000;    //C port LEDs OFF
 
     LATCbits.LATC2 = 1;     //turn on red status LED
+    TRISBbits.RB2 = 1;      //set RB2 to input
 }
 
 void serial_setup(void)
@@ -37,7 +38,11 @@ void serial_setup(void)
 void interrupt_setup(void)
 {
     //Port B interrupt
-    INTCON3 = 0b00010000;       //INT2 enable, low priority, clear IF
+    INTCON3bits.INT2IP = 0;         //INT2 low priority
+    INTCON3bits.INT2IF = 0;         //Clear INT2 flag
+    INTCON2bits.RBPU = 0;           //pull up enable
+    INTCON2bits.INTEDG2 = 0;        //rising/falling (1/0)
+    INTCON3bits.INT2IE = 1;         //Enable INT2
 
     //---------------------
     //Timer Interrupt Setup
@@ -72,25 +77,75 @@ void interrupt_setup(void)
 
     T0CONbits.TMR0ON = 0;           //turn timer 0 on/off (1/0)
     T1CONbits.TMR1ON = 0;           //turn timer 1 on/off (1/0)
+
 }
 
 void i2c_setup(void)
 {
-
     //-------------------
     //Setup I2C
     //-------------------
-    //TRISB |= 0x03;                  //B0 and B1 must be inputs
-    //SSPADD = 0x7F;                  //127
-    SSPADD = 0x78;                  //120 (from Paul)
+
+    SSPADD = 0x78;                  //120
     OpenI2C(MASTER, SLEW_OFF);      //Init I2C module
 
-    printf("Configuring I2C...");
+    printf("\n\n\rConfiguring I2C...");
+
     StartI2C();
-        WriteI2C(0x98);             //announse address (accel is 0x98?)
-        WriteI2C(0x07);             //select the mode register
-        WriteI2C(0x01);             //Place in active mode
+        WriteI2C(0x98);
+        WriteI2C(0x07);                //mode register
+        WriteI2C(0x00);                //Standby mode
     StopI2C();
+    IdleI2C();
+    StartI2C();
+        WriteI2C(0x98);
+        WriteI2C(0x05);                //SPCNT register
+        WriteI2C(0x00);                //No sleep count
+    StopI2C();
+    IdleI2C();
+    StartI2C();
+        WriteI2C(0x98);
+        WriteI2C(0x06);                //interrupt register
+        WriteI2C(0xE0);                //shake INT on 3-axis
+    StopI2C();
+    IdleI2C();
+    StartI2C();
+        WriteI2C(0x98);
+        WriteI2C(0x09);                //PDET register
+        WriteI2C(0xE0);                //No tap detection
+    StopI2C();
+    IdleI2C();
+    StartI2C();
+        WriteI2C(0x98);
+        WriteI2C(0x08);                //SR register
+        WriteI2C(0x02);                //Sample rate at 32/sec
+    StopI2C();
+    IdleI2C();
+    StartI2C();
+        WriteI2C(0x98);
+        WriteI2C(0x0A);                //PD register
+        WriteI2C(0x00);                //No tap detection, debounce
+    StopI2C();
+    IdleI2C();
+    StartI2C();
+        WriteI2C(0x98);            
+        WriteI2C(0x07);             //select the mode register
+        WriteI2C(0x41);             //active mode, int push pull
+    StopI2C();
+
+//    StartI2C();
+//        WriteI2C(0x98);
+//        WriteI2C(0x06);                //interrupt register
+//        //WriteI2C(0xFF);
+//        WriteI2C(0b11100000);       //shake detect on all axis
+//    StopI2C();
+//    IdleI2C();
+//    StartI2C();
+//        WriteI2C(0x98);             //announse address (accel is 0x98?)
+//        WriteI2C(0x07);             //select the mode register
+//        WriteI2C(0x01);             //Place in active mode
+//    StopI2C();
+
     printf("Finished!\r\n");
 }
 
@@ -99,10 +154,10 @@ void setup(void)
     led_setup();
 
     serial_setup();
-
     interrupt_setup();
-
     i2c_setup();
+
+    INTCON3bits.INT2IF = 0;
 
     //Print a welcome message in case someone plugs it up
     printf("Welcome to the RVAsec Badge!\n\r\n\r");
