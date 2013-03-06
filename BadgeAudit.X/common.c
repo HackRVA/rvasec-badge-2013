@@ -105,26 +105,26 @@ void i2c_setup(void)
     IdleI2C();
     StartI2C();
         WriteI2C(0x98);
-        WriteI2C(0x06);                //interrupt register
-        WriteI2C(0xE0);                //shake INT on 3-axis
+        WriteI2C(0x06);                //interrupt register (INTSU)
+        WriteI2C(0xE4);                //shake INT on 3-axis, and tap detect
     StopI2C();
     IdleI2C();
     StartI2C();
         WriteI2C(0x98);
         WriteI2C(0x09);                //PDET register
-        WriteI2C(0xE0);                //No tap detection
+        WriteI2C(0x62);                //tap detection on  z-axis
     StopI2C();
     IdleI2C();
     StartI2C();
         WriteI2C(0x98);
         WriteI2C(0x08);                //SR register
-        WriteI2C(0x02);                //Sample rate at 32/sec
+        WriteI2C(0x00);                //Sample rate at 32/sec
     StopI2C();
     IdleI2C();
     StartI2C();
         WriteI2C(0x98);
         WriteI2C(0x0A);                //PD register
-        WriteI2C(0x00);                //No tap detection, debounce
+        WriteI2C(0x2F);                //test tap detection, debounce
     StopI2C();
     IdleI2C();
     StartI2C();

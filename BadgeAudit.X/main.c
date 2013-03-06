@@ -72,7 +72,8 @@ unsigned char state_id = 0;
 unsigned char status_count = 0;
 
 //Accel vectors
-unsigned char xA, yA, zA, tilt;
+unsigned char xA, yA, zA, 
+            tilt, shake_count = 0, tap_count = 0;
 
 //===========
 //Interrupt handler routines
@@ -140,8 +141,6 @@ void main(void)
                     check_tilt();
                 }
 
-               // Delay10KTCYx(10);
-                //check_accel();
                 break;
             }
 
@@ -223,6 +222,26 @@ void check_tilt(void)
         //Get the the contents of tilt register
         WriteI2C(Accel_Read_Addr);
         tilt = ReadI2C();
+
+        if(tilt & shake)
+        {
+            shake_count++;
+            printf("Device shaken! (count = %u)\n\r", shake_count);
+        }
+        else
+        {
+            shake_count = 0;
+        }
+
+        if(tilt & tap)
+        {
+            tap_count++;
+            printf("Device tapped! (count = %u)\n\r", tap_count);
+        }
+        else
+        {
+            tap_count = 0;
+        }
 
 }
 
