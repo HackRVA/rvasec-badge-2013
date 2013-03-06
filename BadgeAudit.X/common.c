@@ -112,7 +112,7 @@ void i2c_setup(void)
     StartI2C();
         WriteI2C(0x98);
         WriteI2C(0x09);                //PDET register
-        WriteI2C(0x62);                //tap detection on  z-axis
+        WriteI2C(0x84);                //tap detection on  z-axis
     StopI2C();
     IdleI2C();
     StartI2C();

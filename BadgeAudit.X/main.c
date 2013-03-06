@@ -71,9 +71,14 @@ unsigned short badge_id = 0;        //identify badges, 0 is test program
 unsigned char state_id = 0;
 unsigned char status_count = 0;
 
-//Accel vectors
-unsigned char xA, yA, zA, 
-            tilt, shake_count = 0, tap_count = 0;
+unsigned char green_leds = 0;
+
+//Accelerometer related vars
+unsigned char xA, yA, zA,           //Accel vectors
+                tilt,
+                shake_debounce = 0,
+                shake_count = 0,
+                tap_count = 0;
 
 //===========
 //Interrupt handler routines
@@ -135,12 +140,13 @@ void main(void)
             {
                 if(INTCON3bits.INT2IF)
                 {
-                    printf("INTERRUPT DETECTED!\n\r");
+                    //printf("INTERRUPT DETECTED!\n\r");
                     INTCON3bits.INT2IF = 0;
                     INTCON3bits.INT2IE = 1;
                     check_tilt();
                 }
-
+                PORTA = (green_leds & 0x3F);
+                PORTC = (green_leds >>6) | 0x04;
                 break;
             }
 
@@ -225,21 +231,42 @@ void check_tilt(void)
 
         if(tilt & shake)
         {
-            shake_count++;
-            printf("Device shaken! (count = %u)\n\r", shake_count);
+            shake_debounce++;
+            if(shake_debounce > 10)
+            {
+               shake_count++;
+               shake_debounce = 0;
+               green_leds = 0;
+               printf("Device shaken! (count = %u)\n\r", shake_count);
+            }
+           
         }
         else
         {
+            shake_debounce = 0;
             shake_count = 0;
+
         }
 
         if(tilt & tap)
         {
             tap_count++;
+            
+            if(!green_leds)
+                green_leds = 0x01;
+            else if(green_leds == 0xFF)
+                green_leds =0;
+            else
+            {
+                green_leds = green_leds << 1;
+                green_leds |= 0x01;
+            }
+
             printf("Device tapped! (count = %u)\n\r", tap_count);
         }
         else
         {
+            //green_leds = 0x00;
             tap_count = 0;
         }
 
