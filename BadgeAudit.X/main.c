@@ -31,7 +31,7 @@ void highIntHandle(void);
 void lowIntHandle(void);
 void check_accel(void);
 void activate_shake_det(void);
-void check_shake(void);
+void check_tilt(void);
 
 //===========
 //Interrupt Vectors
@@ -54,6 +54,16 @@ void low_isr(void)
 //===========
 #define Accel_Write_Addr 0x98
 #define Accel_Read_Addr 0x99
+
+//Logical and these with tilt to get badge accel state
+#define alert 0x40
+#define shake 0x80
+#define tap 0x20
+#define landscape_left 0x04
+#define landscape_right 0x08
+#define vertical_invert 0x14
+#define vertical_normal 0x18
+
 #define idle 0
 #define ir_respond 1
 
@@ -62,7 +72,7 @@ unsigned char state_id = 0;
 unsigned char status_count = 0;
 
 //Accel vectors
-unsigned char xA, yA, zA, shake_tilt;
+unsigned char xA, yA, zA, tilt;
 
 //===========
 //Interrupt handler routines
@@ -94,7 +104,7 @@ void lowIntHandle(void)
 {
     if(INTCON3bits.INT2IF) //check for INT2 (B2-Accel INT)
     {
-         check_shake();
+         check_tilt();
          //INTCON3 = 0b00010000;  //re enable
          INTCON3bits.INT2IF = 0;  //clear flag
     }
@@ -127,7 +137,7 @@ void main(void)
                     printf("INTERRUPT DETECTED!\n\r");
                     INTCON3bits.INT2IF = 0;
                     INTCON3bits.INT2IE = 1;
-                    check_shake();
+                    check_tilt();
                 }
 
                // Delay10KTCYx(10);
@@ -200,20 +210,19 @@ void check_accel(void)
     Delay10KTCYx(400);
 }
 
-void check_shake(void)
+void check_tilt(void)
 {
-    printf("Shake detected!!\n\r");
     StartI2C();
 
-        //Tell Badge we want X axis
+        //Tell Badge we want tilt register
         WriteI2C(Accel_Write_Addr);
         WriteI2C(0x03);
         
     RestartI2C();
 
-        //Get the X axis
+        //Get the the contents of tilt register
         WriteI2C(Accel_Read_Addr);
-        shake_tilt = ReadI2C();
+        tilt = ReadI2C();
 
 }
 

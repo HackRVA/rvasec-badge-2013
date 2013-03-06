@@ -133,19 +133,6 @@ void i2c_setup(void)
         WriteI2C(0x41);             //active mode, int push pull
     StopI2C();
 
-//    StartI2C();
-//        WriteI2C(0x98);
-//        WriteI2C(0x06);                //interrupt register
-//        //WriteI2C(0xFF);
-//        WriteI2C(0b11100000);       //shake detect on all axis
-//    StopI2C();
-//    IdleI2C();
-//    StartI2C();
-//        WriteI2C(0x98);             //announse address (accel is 0x98?)
-//        WriteI2C(0x07);             //select the mode register
-//        WriteI2C(0x01);             //Place in active mode
-//    StopI2C();
-
     printf("Finished!\r\n");
 }
 
