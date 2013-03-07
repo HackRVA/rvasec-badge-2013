@@ -30,7 +30,6 @@ void tmr0_routine(void);
 void highIntHandle(void);
 void lowIntHandle(void);
 void check_accel(void);
-void activate_shake_det(void);
 void check_tilt(void);
 
 //===========
@@ -55,7 +54,7 @@ void low_isr(void)
 #define Accel_Write_Addr 0x98
 #define Accel_Read_Addr 0x99
 
-//Logical and these with tilt to get badge accel state
+//Logical AND these with tilt to get badge accel state
 #define alert 0x40
 #define shake 0x80
 #define tap 0x20
@@ -138,15 +137,23 @@ void main(void)
         {
             case (idle):
             {
+                //Poll INT2
                 if(INTCON3bits.INT2IF)
                 {
-                    //printf("INTERRUPT DETECTED!\n\r");
+                    //reset flag, re-enable
                     INTCON3bits.INT2IF = 0;
                     INTCON3bits.INT2IE = 1;
+
+                    //see what the interrupt was for
                     check_tilt();
                 }
+                
+                //mask out the lower 5 bits
                 PORTA = (green_leds & 0x3F);
+
+                //get upper bits, keep status LED on
                 PORTC = (green_leds >>6) | 0x04;
+
                 break;
             }
 
@@ -229,32 +236,34 @@ void check_tilt(void)
         WriteI2C(Accel_Read_Addr);
         tilt = ReadI2C();
 
+        //was it shaken?
         if(tilt & shake)
         {
             shake_debounce++;
+
+            //must get 10 shake samples to register
             if(shake_debounce > 10)
             {
                shake_count++;
                shake_debounce = 0;
                green_leds = 0;
-               printf("Device shaken! (count = %u)\n\r", shake_count);
+               printf("Shaken! (count = %u)\n\r", shake_count);
             }
-           
         }
-        else
+        else//not shaken, reset counters
         {
             shake_debounce = 0;
             shake_count = 0;
-
         }
 
+        //was it tapped?
         if(tilt & tap)
         {
+            //unused at this point
             tap_count++;
-            
-            if(!green_leds)
-                green_leds = 0x01;
-            else if(green_leds == 0xFF)
+
+            //turn reset if they are all on
+            if(green_leds == 0xFF)
                 green_leds =0;
             else
             {
@@ -262,17 +271,10 @@ void check_tilt(void)
                 green_leds |= 0x01;
             }
 
-            printf("Device tapped! (count = %u)\n\r", tap_count);
+            printf("Tapped! (count = %u)\n\r", tap_count);
         }
         else
         {
-            //green_leds = 0x00;
             tap_count = 0;
         }
-
-}
-
-void activate_shake_det(void)
-{
-    
 }
