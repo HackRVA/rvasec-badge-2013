@@ -13,6 +13,7 @@ void led_setup(void)
 
     LATCbits.LATC2 = 1;     //turn on red status LED
     TRISBbits.RB2 = 1;      //set RB2 to input
+    TRISBbits.RB3 = 0;      //speaker output
 }
 
 void serial_setup(void)

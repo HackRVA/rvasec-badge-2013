@@ -63,8 +63,10 @@ void low_isr(void)
 #define vertical_invert 0x14
 #define vertical_normal 0x18
 
+//states
 #define idle 0
 #define ir_respond 1
+#define speak 2
 
 unsigned short badge_id = 0;        //identify badges, 0 is test program
 unsigned char state_id = 0;
@@ -127,6 +129,8 @@ void tmr0_routine(void)
 
 void main(void)
 {
+    unsigned char count = 0;
+
     //initialize all the things
     setup();
 
@@ -154,11 +158,31 @@ void main(void)
                 //get upper bits, keep status LED on
                 PORTC = (green_leds >>6) | 0x04;
 
+                if(green_leds == 0xFF)
+                    state_id = speak;
+                    //LATBbits.LATB3 = ~LATBbits.LATB3;
+
                 break;
             }
 
             case(ir_respond):
             {
+                break;
+            }
+
+            case(speak):
+            {
+                count++;
+                if(!count)
+                {
+                    state_id = idle;
+                    green_leds = 0;
+                }
+                
+                LATBbits.LATB3 = ~LATBbits.LATB3;
+                Delay10KTCYx(4);
+                LATBbits.LATB3 = ~LATBbits.LATB3;
+                Delay10KTCYx(4);
                 break;
             }
         }
