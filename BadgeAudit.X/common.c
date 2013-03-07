@@ -38,10 +38,15 @@ void serial_setup(void)
 
 void interrupt_setup(void)
 {
+    //reset interrupt control regs
+    INTCON = 0;
+    INTCON2 = 0;
+    INTCON3 = 0;
+
     //Port B interrupt
     INTCON3bits.INT2IP = 0;         //INT2 low priority
     INTCON3bits.INT2IF = 0;         //Clear INT2 flag
-    INTCON2bits.RBPU = 0;           //pull up enable
+    INTCON2bits.RBPU = 1;           //pull up enable
     INTCON2bits.INTEDG2 = 0;        //rising/falling (1/0)
     INTCON3bits.INT2IE = 1;         //Enable INT2
 

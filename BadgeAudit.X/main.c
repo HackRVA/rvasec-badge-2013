@@ -26,11 +26,12 @@
 //===========
 //Prototypes
 //===========
-void tmr0_routine(void);
 void highIntHandle(void);
 void lowIntHandle(void);
+void tmr0_routine(void);
 void check_accel(void);
 void check_tilt(void);
+void set_leds(unsigned char leds);
 
 //===========
 //Interrupt Vectors
@@ -41,7 +42,7 @@ void high_isr(void)
     _asm goto highIntHandle _endasm
 }
 
-#pragma code low_isr=0x22
+#pragma code low_isr=0x18
 void low_isr(void)
 {
     _asm goto lowIntHandle _endasm
@@ -67,6 +68,7 @@ void low_isr(void)
 #define idle 0
 #define ir_respond 1
 #define speak 2
+#define handle_tilt 3
 
 unsigned short badge_id = 0;        //identify badges, 0 is test program
 unsigned char state_id = 0;
@@ -111,11 +113,11 @@ void lowIntHandle(void)
 {
     if(INTCON3bits.INT2IF) //check for INT2 (B2-Accel INT)
     {
-         check_tilt();
-         //INTCON3 = 0b00010000;  //re enable
+         state_id = handle_tilt;
+
          INTCON3bits.INT2IF = 0;  //clear flag
+         INTCON3bits.INT2IE = 1;  //re-enable interrupt
     }
-    LATAbits.LATA0 = 1;
 }
 
 void tmr0_routine(void)
@@ -129,8 +131,6 @@ void tmr0_routine(void)
 
 void main(void)
 {
-    unsigned char count = 0;
-
     //initialize all the things
     setup();
 
@@ -141,27 +141,14 @@ void main(void)
         {
             case (idle):
             {
-                //Poll INT2
-                if(INTCON3bits.INT2IF)
-                {
-                    //reset flag, re-enable
-                    INTCON3bits.INT2IF = 0;
-                    INTCON3bits.INT2IE = 1;
+                set_leds(green_leds);
+                break;
+            }
 
-                    //see what the interrupt was for
-                    check_tilt();
-                }
-                
-                //mask out the lower 5 bits
-                PORTA = (green_leds & 0x3F);
-
-                //get upper bits, keep status LED on
-                PORTC = (green_leds >>6) | 0x04;
-
-                if(green_leds == 0xFF)
-                    state_id = speak;
-                    //LATBbits.LATB3 = ~LATBbits.LATB3;
-
+            case (handle_tilt):
+            {
+                state_id = idle;
+                check_tilt();
                 break;
             }
 
@@ -172,15 +159,9 @@ void main(void)
 
             case(speak):
             {
-                count++;
-                if(!count)
-                {
-                    state_id = idle;
-                    green_leds = 0;
-                }
-                
-                LATBbits.LATB3 = ~LATBbits.LATB3;
-                Delay10KTCYx(4);
+                //make sure INT didn't cause a missed LED
+                set_leds(green_leds);
+
                 LATBbits.LATB3 = ~LATBbits.LATB3;
                 Delay10KTCYx(4);
                 break;
@@ -268,7 +249,10 @@ void check_tilt(void)
             //must get 10 shake samples to register
             if(shake_debounce > 10)
             {
+               //unused
                shake_count++;
+
+               state_id = idle;
                shake_debounce = 0;
                green_leds = 0;
                printf("Shaken! (count = %u)\n\r", shake_count);
@@ -288,9 +272,15 @@ void check_tilt(void)
 
             //turn reset if they are all on
             if(green_leds == 0xFF)
-                green_leds =0;
+            {
+                green_leds = 0;
+                state_id = idle;
+            }
             else
             {
+                if(green_leds == 0x7F)
+                    state_id = speak;
+
                 green_leds = green_leds << 1;
                 green_leds |= 0x01;
             }
@@ -301,4 +291,16 @@ void check_tilt(void)
         {
             tap_count = 0;
         }
+    return;
+}
+
+void set_leds(unsigned char leds)
+{
+    //mask out the lower 5 bits
+    PORTA = (leds & 0x3F);
+
+    //get upper bits, keep status LED on
+    PORTC = (leds >>6) | 0x04;
+        
+    return;
 }
