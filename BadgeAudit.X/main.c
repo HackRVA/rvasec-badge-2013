@@ -71,10 +71,10 @@ void low_isr(void)
 #define handle_tilt 3
 
 unsigned short badge_id = 0;        //identify badges, 0 is test program
-unsigned char state_id = 0;
-unsigned char status_count = 0;
+volatile unsigned char state_id = 0;
+volatile unsigned char status_count = 0;
 
-unsigned char green_leds = 0;
+volatile unsigned char green_leds = 0;
 
 //Accelerometer related vars
 unsigned char xA, yA, zA,           //Accel vectors
@@ -97,15 +97,10 @@ void highIntHandle(void)
           //clear interrupt flag
           INTCONbits.TMR0IF = 0;
       }
-      else if (INTCON3bits.INT2IF)//(PIR1bits.TMR1IF)
-      {
-            LATAbits.LATA1 = 1;
-      }
       else
       {
 
-      }
-      
+      }  
 }
 
 #pragma interruptlow lowIntHandle
@@ -125,7 +120,7 @@ void tmr0_routine(void)
 //    status_count += 1;
 //
 //    if(!status_count)
-//        LATCbits.LATC2 = ~LATCbits.LATC2;
+       LATCbits.LATC1 = ~LATCbits.LATC1;
 }
 
 
@@ -149,6 +144,7 @@ void main(void)
             {
                 state_id = idle;
                 check_tilt();
+                set_leds(green_leds);
                 break;
             }
 

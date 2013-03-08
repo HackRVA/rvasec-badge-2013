@@ -2,7 +2,7 @@
 
 void led_setup(void)
 {
-    TRISA &= 0b11000000;    //Green LEDs pin
+    TRISA &= 0b11000000;    //Green LEDs pin: set to output
     PORTA &= 0b11000000;    //Green LEDs OFF
 
     TRISB &= 0b11011111;    //IR LED pin
@@ -81,7 +81,7 @@ void interrupt_setup(void)
     TMR1L = 0;                      //Timer 1 counts up from 0
     TMR1H = 0;
 
-    T0CONbits.TMR0ON = 0;           //turn timer 0 on/off (1/0)
+    T0CONbits.TMR0ON = 1;           //turn timer 0 on/off (1/0)
     T1CONbits.TMR1ON = 0;           //turn timer 1 on/off (1/0)
 
 }
