@@ -71,17 +71,18 @@ void low_isr(void)
 #define handle_tilt 3
 
 unsigned short badge_id = 0;        //identify badges, 0 is test program
-unsigned char state_id = 0;
+volatile unsigned char state_id = 0;
 unsigned char status_count = 0;
 
 unsigned char green_leds = 0;
 
 //Accelerometer related vars
 unsigned char xA, yA, zA,           //Accel vectors
-                tilt,
                 shake_debounce = 0,
                 shake_count = 0,
                 tap_count = 0;
+
+volatile unsigned char tilt = 0;
 
 //===========
 //Interrupt handler routines
@@ -113,10 +114,23 @@ void lowIntHandle(void)
 {
     if(INTCON3bits.INT2IF) //check for INT2 (B2-Accel INT)
     {
-         state_id = handle_tilt;
+        //use I2C to read accelerometer's tilt register
+        StartI2C();
 
-         INTCON3bits.INT2IF = 0;  //clear flag
-         INTCON3bits.INT2IE = 1;  //re-enable interrupt
+        //Tell Badge we want tilt register
+        WriteI2C(Accel_Write_Addr);
+        WriteI2C(0x03);
+
+        RestartI2C();
+
+        //Get the the contents of tilt register
+        WriteI2C(Accel_Read_Addr);
+        tilt = ReadI2C();
+
+        //make sure the upadte is handled
+        state_id = handle_tilt;
+
+        INTCON3bits.INT2IF = 0;  //clear flag
     }
 }
 
@@ -127,7 +141,6 @@ void tmr0_routine(void)
 //    if(!status_count)
 //        LATCbits.LATC2 = ~LATCbits.LATC2;
 }
-
 
 void main(void)
 {
@@ -141,14 +154,20 @@ void main(void)
         {
             case (idle):
             {
-                set_leds(green_leds);
                 break;
             }
 
             case (handle_tilt):
             {
-                state_id = idle;
                 check_tilt();
+
+                if(green_leds == 0xFF)
+                    state_id = speak;
+                else
+                    state_id = idle;
+
+                set_leds(green_leds);
+                
                 break;
             }
 
@@ -159,10 +178,10 @@ void main(void)
 
             case(speak):
             {
-                //make sure INT didn't cause a missed LED
-                set_leds(green_leds);
-
+                //toggle speaker port to create buzz
                 LATBbits.LATB3 = ~LATBbits.LATB3;
+
+                //PIC is way faster than Piezo freq
                 Delay10KTCYx(4);
                 break;
             }
@@ -229,18 +248,6 @@ void check_accel(void)
 
 void check_tilt(void)
 {
-    StartI2C();
-
-        //Tell Badge we want tilt register
-        WriteI2C(Accel_Write_Addr);
-        WriteI2C(0x03);
-        
-    RestartI2C();
-
-        //Get the the contents of tilt register
-        WriteI2C(Accel_Read_Addr);
-        tilt = ReadI2C();
-
         //was it shaken?
         if(tilt & shake)
         {
@@ -252,7 +259,7 @@ void check_tilt(void)
                //unused
                shake_count++;
 
-               state_id = idle;
+               //state_id = idle;
                shake_debounce = 0;
                green_leds = 0;
                printf("Shaken! (count = %u)\n\r", shake_count);
@@ -274,13 +281,10 @@ void check_tilt(void)
             if(green_leds == 0xFF)
             {
                 green_leds = 0;
-                state_id = idle;
+                //state_id = idle;
             }
             else
             {
-                if(green_leds == 0x7F)
-                    state_id = speak;
-
                 green_leds = green_leds << 1;
                 green_leds |= 0x01;
             }
@@ -291,6 +295,8 @@ void check_tilt(void)
         {
             tap_count = 0;
         }
+        
+
     return;
 }
 
