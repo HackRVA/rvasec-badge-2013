@@ -86,13 +86,13 @@ unsigned char xA, yA, zA,           //Accel vectors
 volatile unsigned char tilt = 0;
 volatile unsigned char timer0_value;// = A_TONE;
 volatile unsigned char timer0_count = 0;
-volatile unsigned char note_length = 255;
+volatile unsigned char note_length = 105;
 volatile unsigned char song_index = 0;
 volatile unsigned char song[SONG_SIZE]
-={A_TONE_h, 0, A_TONE_h, 0, A_TONE_h, 0, A_TONE_h, 0,
-  A_TONE_h, 0, A_TONE_h, 0, A_TONE_h, 0, A_TONE_h, 0,
-  A_TONE_h, 0, A_TONE_h, 0, A_TONE_h, 0, A_TONE_h, 0,
-  A_TONE_h, 0, A_TONE_h, 0, A_TONE_h, 0, A_TONE_h, 0,};
+={A_TONE_h, 0, A_TONE_h, B_TONE_h, C_TONE_h, 0, A_TONE_h, 0,
+  A_TONE_h, 0, A_TONE_h, B_TONE_h, C_TONE_h, 0, A_TONE_h, 0,
+  B_TONE_h, 0, B_TONE_h, 0, C_TONE_h, 0, C_TONE_h, 0,
+  C_TONE_h, 0, C_TONE_h, B_TONE_h, A_TONE_h, 0, C_TONE_h, 0};
 
 //===========
 //Interrupt handler routines
@@ -129,7 +129,7 @@ void highIntHandle(void)
           //if note not a rest
           if(song[song_index])
           {
-                TMR0H = A_TONE_h;
+                TMR0H = song[song_index];
                 TMR0L = A_TONE_l;
 
                 //play tone
