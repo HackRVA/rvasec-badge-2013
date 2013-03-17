@@ -82,7 +82,17 @@ unsigned char xA, yA, zA,           //Accel vectors
                 shake_count = 0,
                 tap_count = 0;
 
+#define SONG_SIZE 32
 volatile unsigned char tilt = 0;
+volatile unsigned char timer0_value;// = A_TONE;
+volatile unsigned char timer0_count = 0;
+volatile unsigned char note_length = 255;
+volatile unsigned char song_index = 0;
+volatile unsigned char song[SONG_SIZE]
+={A_TONE_h, 0, A_TONE_h, 0, A_TONE_h, 0, A_TONE_h, 0,
+  A_TONE_h, 0, A_TONE_h, 0, A_TONE_h, 0, A_TONE_h, 0,
+  A_TONE_h, 0, A_TONE_h, 0, A_TONE_h, 0, A_TONE_h, 0,
+  A_TONE_h, 0, A_TONE_h, 0, A_TONE_h, 0, A_TONE_h, 0,};
 
 //===========
 //Interrupt handler routines
@@ -92,8 +102,46 @@ void highIntHandle(void)
 {
       if(INTCONbits.TMR0IF)
       {
-          //jump to some function
-          tmr0_routine();
+          timer0_count += 1;
+
+          //has the note been playing long enough?
+          if(note_length == timer0_count)
+          {
+              //at the end of the song?
+              if(song_index < SONG_SIZE - 1)
+              {
+                  //move to next note
+                  song_index += 1;
+              }
+              else//start song over
+              {
+                  song_index = 0;
+              }
+              
+              //reset counter
+              timer0_count = 0;
+          }
+          else//keep playing note
+          {
+              timer0_count += 1;
+          }
+          
+          //if note not a rest
+          if(song[song_index])
+          {
+                TMR0H = A_TONE_h;
+                TMR0L = A_TONE_l;
+
+                //play tone
+                LATBbits.LATB3 = ~LATBbits.LATB3;
+          }
+          else
+          {
+              TMR0H = A_TONE_h;
+              TMR0L = A_TONE_l;
+              //keep speaker off
+              LATBbits.LATB3 = 0;
+          }
 
           //clear interrupt flag
           INTCONbits.TMR0IF = 0;
