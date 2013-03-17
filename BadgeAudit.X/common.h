@@ -6,6 +6,8 @@
 
 #ifndef COMMON_H
 #define	COMMON_H
+#define A_TONE_h 0x5F
+#define A_TONE_l 0x0f
 
 void led_setup(void);
 
