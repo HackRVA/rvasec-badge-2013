@@ -75,15 +75,14 @@ void interrupt_setup(void)
     INTCONbits.PEIE = 1;            //Peripheral interrupt enable
     INTCONbits.GIE = 1;             //enable global interrupt
 
-    TMR0L = A_TONE_l;                      //Timer 0 counts up from 208
-    TMR0H = A_TONE_h;
+    TMR0L = 0;                      //Timer 0 counts up from 208
+    TMR0H = TONE_LOW_BYTE;
 
     TMR1L = 0;                      //Timer 1 counts up from 0
     TMR1H = 0;
 
-    T0CONbits.TMR0ON = 1;           //turn timer 0 on/off (1/0)
+    T0CONbits.TMR0ON = 0;           //turn timer 0 on/off (1/0)
     T1CONbits.TMR1ON = 0;           //turn timer 1 on/off (1/0)
-
 }
 
 void i2c_setup(void)

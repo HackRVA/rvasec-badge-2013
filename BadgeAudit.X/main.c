@@ -86,13 +86,15 @@ unsigned char xA, yA, zA,           //Accel vectors
 volatile unsigned char tilt = 0;
 volatile unsigned char timer0_value;// = A_TONE;
 volatile unsigned char timer0_count = 0;
-volatile unsigned char note_length = 105;
-volatile unsigned char song_index = 0;
-volatile unsigned char song[SONG_SIZE]
-={A_TONE_h, 0, A_TONE_h, B_TONE_h, C_TONE_h, 0, A_TONE_h, 0,
-  A_TONE_h, 0, A_TONE_h, B_TONE_h, C_TONE_h, 0, A_TONE_h, 0,
-  B_TONE_h, 0, B_TONE_h, 0, C_TONE_h, 0, C_TONE_h, 0,
-  C_TONE_h, 0, C_TONE_h, B_TONE_h, A_TONE_h, 0, C_TONE_h, 0};
+
+volatile unsigned char excite[SONG_SIZE]
+={A_TONE_h, Ash_TONE_h, B_TONE_h, C_TONE_h, Csh_TONE_h, D_TONE_h, Dsh_TONE_h, 0,
+  B_TONE_h, C_TONE_h, Csh_TONE_h, D_TONE_h, E_TONE_h, F_TONE_h, Fsh_TONE_h, 0,
+  C_TONE_h, Csh_TONE_h, D_TONE_h, E_TONE_h, F_TONE_h, Fsh_TONE_h, G_TONE_h, 0,
+  Fsh_TONE_h, G_TONE_h, Gsh_TONE_h, Fsh_TONE_h, G_TONE_h, Gsh_TONE_h, Gsh_TONE_h, 0};
+
+struct song_desc excite_song = {35, 0, excite};
+struct song_desc *playing;
 
 //===========
 //Interrupt handler routines
@@ -105,17 +107,17 @@ void highIntHandle(void)
           timer0_count += 1;
 
           //has the note been playing long enough?
-          if(note_length == timer0_count)
+          if(playing->note_length == timer0_count)
           {
               //at the end of the song?
-              if(song_index < SONG_SIZE - 1)
+              if(playing->song_index < SONG_SIZE - 1)
               {
                   //move to next note
-                  song_index += 1;
+                  playing->song_index += 1;
               }
               else//start song over
               {
-                  song_index = 0;
+                  playing->song_index = 0;
               }
               
               //reset counter
@@ -127,10 +129,10 @@ void highIntHandle(void)
           }
           
           //if note not a rest
-          if(song[song_index])
+          if(playing->song[playing->song_index])
           {
-                TMR0H = song[song_index];
-                TMR0L = A_TONE_l;
+                TMR0H = playing->song[playing->song_index];
+                TMR0L = TONE_LOW_BYTE;
 
                 //play tone
                 LATBbits.LATB3 = ~LATBbits.LATB3;
@@ -138,7 +140,8 @@ void highIntHandle(void)
           else
           {
               TMR0H = A_TONE_h;
-              TMR0L = A_TONE_l;
+              TMR0L = TONE_LOW_BYTE;
+
               //keep speaker off
               LATBbits.LATB3 = 0;
           }
@@ -151,10 +154,7 @@ void highIntHandle(void)
             LATAbits.LATA1 = 1;
       }
       else
-      {
-
-      }
-      
+      {}
 }
 
 #pragma interruptlow lowIntHandle
@@ -192,6 +192,9 @@ void tmr0_routine(void)
 
 void main(void)
 {
+    //set the starting song
+    playing = &excite_song;
+    
     //initialize all the things
     setup();
 
@@ -209,10 +212,13 @@ void main(void)
             {
                 check_tilt();
 
+                //if all LEDS on
                 if(green_leds == 0xFF)
-                    state_id = speak;
+                    T0CONbits.TMR0ON = 1; //play song
                 else
-                    state_id = idle;
+                    T0CONbits.TMR0ON = 0; //stop song
+
+                    state_id = idle;      //return to idle state
 
                 set_leds(green_leds);
                 
@@ -227,10 +233,10 @@ void main(void)
             case(speak):
             {
                 //toggle speaker port to create buzz
-                LATBbits.LATB3 = ~LATBbits.LATB3;
+                //LATBbits.LATB3 = ~LATBbits.LATB3;
 
                 //PIC is way faster than Piezo freq
-                Delay10KTCYx(4);
+                //Delay10KTCYx(4);
                 break;
             }
         }
