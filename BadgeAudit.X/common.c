@@ -61,9 +61,9 @@ void interrupt_setup(void)
     //Timer 0 setup
     INTCONbits.TMR0IE = 1;          //Enable Timer 0
     T0CONbits.T08BIT = 0;           //timer 0 set to 16 bit (1 = 8 bit)
-    T0CONbits.T0PS = 0b00;          //Timer 0 Prescalar select (0b00 = 1:2)
+    T0CONbits.T0PS = 0b111;          //Timer 0 Prescalar select (0b111 = 1:256)
     T0CONbits.T0CS = 0;             //Timer 0 source select (0 = inter inst. clk
-    T0CONbits.PSA = 0;              //Timer 0 turn scalar off
+    T0CONbits.PSA = 1;              //Timer 0 turn scalar on
     INTCON2bits.TMR0IP = 1;         //Timer 0 interrupt priority (1 = high)
 
     //Timer 1 setup
@@ -75,15 +75,14 @@ void interrupt_setup(void)
     INTCONbits.PEIE = 1;            //Peripheral interrupt enable
     INTCONbits.GIE = 1;             //enable global interrupt
 
-    TMR0L = 0;                      //Timer 0 counts up from 0
-    TMR0H = 0;
+    TMR0L = 0;                      //Timer 0 counts up from 208
+    TMR0H = TONE_LOW_BYTE;
 
     TMR1L = 0;                      //Timer 1 counts up from 0
     TMR1H = 0;
 
     T0CONbits.TMR0ON = 1;           //turn timer 0 on/off (1/0)
     T1CONbits.TMR1ON = 0;           //turn timer 1 on/off (1/0)
-
 }
 
 void i2c_setup(void)

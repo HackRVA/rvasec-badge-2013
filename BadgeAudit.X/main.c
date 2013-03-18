@@ -72,16 +72,31 @@ void low_isr(void)
 
 unsigned short badge_id = 0;        //identify badges, 0 is test program
 volatile unsigned char state_id = 0;
+
 volatile unsigned char status_count = 0;
+=======
 
 volatile unsigned char green_leds = 0;
 
 //Accelerometer related vars
 unsigned char xA, yA, zA,           //Accel vectors
-                tilt,
                 shake_debounce = 0,
                 shake_count = 0,
                 tap_count = 0;
+
+#define SONG_SIZE 32
+volatile unsigned char tilt = 0;
+volatile unsigned char timer0_value;// = A_TONE;
+volatile unsigned char timer0_count = 0;
+
+volatile unsigned char excite[SONG_SIZE]
+={A_TONE_h, Ash_TONE_h, B_TONE_h, C_TONE_h, Csh_TONE_h, D_TONE_h, Dsh_TONE_h, 0,
+  B_TONE_h, C_TONE_h, Csh_TONE_h, D_TONE_h, E_TONE_h, F_TONE_h, Fsh_TONE_h, 0,
+  C_TONE_h, Csh_TONE_h, D_TONE_h, E_TONE_h, F_TONE_h, Fsh_TONE_h, G_TONE_h, 0,
+  Fsh_TONE_h, G_TONE_h, Gsh_TONE_h, Fsh_TONE_h, G_TONE_h, Gsh_TONE_h, Gsh_TONE_h, 0};
+
+struct song_desc excite_song = {35, 0, excite};
+struct song_desc *playing;
 
 //===========
 //Interrupt handler routines
@@ -91,16 +106,59 @@ void highIntHandle(void)
 {
       if(INTCONbits.TMR0IF)
       {
-          //jump to some function
-          tmr0_routine();
+          timer0_count += 1;
+
+          //has the note been playing long enough?
+          if(playing->note_length == timer0_count)
+          {
+              //at the end of the song?
+              if(playing->song_index < SONG_SIZE - 1)
+              {
+                  //move to next note
+                  playing->song_index += 1;
+              }
+              else//start song over
+              {
+                  playing->song_index = 0;
+              }
+              
+              //reset counter
+              timer0_count = 0;
+          }
+          else//keep playing note
+          {
+              timer0_count += 1;
+          }
+          
+          //if note not a rest
+          if(playing->song[playing->song_index])
+          {
+                TMR0H = playing->song[playing->song_index];
+                TMR0L = TONE_LOW_BYTE;
+
+                //play tone
+                LATBbits.LATB3 = ~LATBbits.LATB3;
+          }
+          else
+          {
+              TMR0H = A_TONE_h;
+              TMR0L = TONE_LOW_BYTE;
+
+              //keep speaker off
+              LATBbits.LATB3 = 0;
+          }
 
           //clear interrupt flag
           INTCONbits.TMR0IF = 0;
       }
       else
+<<<<<<< HEAD
       {
 
       }  
+=======
+      {}
+>>>>>>> origin/master
 }
 
 #pragma interruptlow lowIntHandle
@@ -108,10 +166,23 @@ void lowIntHandle(void)
 {
     if(INTCON3bits.INT2IF) //check for INT2 (B2-Accel INT)
     {
-         state_id = handle_tilt;
+        //use I2C to read accelerometer's tilt register
+        StartI2C();
 
-         INTCON3bits.INT2IF = 0;  //clear flag
-         INTCON3bits.INT2IE = 1;  //re-enable interrupt
+        //Tell Badge we want tilt register
+        WriteI2C(Accel_Write_Addr);
+        WriteI2C(0x03);
+
+        RestartI2C();
+
+        //Get the the contents of tilt register
+        WriteI2C(Accel_Read_Addr);
+        tilt = ReadI2C();
+
+        //make sure the upadte is handled
+        state_id = handle_tilt;
+
+        INTCON3bits.INT2IF = 0;  //clear flag
     }
 }
 
@@ -123,9 +194,11 @@ void tmr0_routine(void)
        LATCbits.LATC1 = ~LATCbits.LATC1;
 }
 
-
 void main(void)
 {
+    //set the starting song
+    playing = &excite_song;
+    
     //initialize all the things
     setup();
 
@@ -136,15 +209,27 @@ void main(void)
         {
             case (idle):
             {
-                set_leds(green_leds);
                 break;
             }
 
             case (handle_tilt):
             {
-                state_id = idle;
                 check_tilt();
+<<<<<<< HEAD
                 set_leds(green_leds);
+=======
+
+                //if all LEDS on
+                if(green_leds == 0xFF)
+                    T0CONbits.TMR0ON = 1; //play song
+                else
+                    T0CONbits.TMR0ON = 0; //stop song
+
+                    state_id = idle;      //return to idle state
+
+                set_leds(green_leds);
+                
+>>>>>>> origin/master
                 break;
             }
 
@@ -155,11 +240,11 @@ void main(void)
 
             case(speak):
             {
-                //make sure INT didn't cause a missed LED
-                set_leds(green_leds);
+                //toggle speaker port to create buzz
+                //LATBbits.LATB3 = ~LATBbits.LATB3;
 
-                LATBbits.LATB3 = ~LATBbits.LATB3;
-                Delay10KTCYx(4);
+                //PIC is way faster than Piezo freq
+                //Delay10KTCYx(4);
                 break;
             }
         }
@@ -225,18 +310,6 @@ void check_accel(void)
 
 void check_tilt(void)
 {
-    StartI2C();
-
-        //Tell Badge we want tilt register
-        WriteI2C(Accel_Write_Addr);
-        WriteI2C(0x03);
-        
-    RestartI2C();
-
-        //Get the the contents of tilt register
-        WriteI2C(Accel_Read_Addr);
-        tilt = ReadI2C();
-
         //was it shaken?
         if(tilt & shake)
         {
@@ -248,7 +321,7 @@ void check_tilt(void)
                //unused
                shake_count++;
 
-               state_id = idle;
+               //state_id = idle;
                shake_debounce = 0;
                green_leds = 0;
                printf("Shaken! (count = %u)\n\r", shake_count);
@@ -270,13 +343,10 @@ void check_tilt(void)
             if(green_leds == 0xFF)
             {
                 green_leds = 0;
-                state_id = idle;
+                //state_id = idle;
             }
             else
             {
-                if(green_leds == 0x7F)
-                    state_id = speak;
-
                 green_leds = green_leds << 1;
                 green_leds |= 0x01;
             }
@@ -287,6 +357,8 @@ void check_tilt(void)
         {
             tap_count = 0;
         }
+        
+
     return;
 }
 
