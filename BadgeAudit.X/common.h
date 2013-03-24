@@ -45,6 +45,10 @@ struct song_desc {
 
 struct event_buffer
 {
+    enum Event *current_seq;
+    enum Event seq0;
+    enum Event seq1;
+
     enum Event front;
     enum Event middle;
     enum Event back;
