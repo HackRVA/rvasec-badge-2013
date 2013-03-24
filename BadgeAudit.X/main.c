@@ -23,7 +23,10 @@
 //2.25 ms of assert for a logic 1
 //1.125 ms of zero for a logc 0
 //  - rest of the zero time is spent off
+char seq_num = 0;
+enum Event seq0 = empty_ev, seq1 = empty_ev;
 
+struct event_buffer evBuff = {empty_ev, empty_ev, empty_ev};
 //===========
 //Prototypes
 //===========
@@ -34,7 +37,8 @@ void handle_song(void);
 void check_accel(void);
 void check_tilt(void);
 void set_leds(unsigned char leds);
-
+enum Event get_next(void);
+void enqueue(enum Event ev);
 //===========
 //Interrupt Vectors
 //===========
@@ -49,11 +53,6 @@ void low_isr(void)
 {
     _asm goto lowIntHandle _endasm
 }
-
-
-
-
-
 
 volatile enum State state = idle;
 
@@ -118,7 +117,18 @@ void lowIntHandle(void)
         tilt = ReadI2C();
 
         //make sure the upadte is handled
-        state = handle_tilt;
+        //state = handle_tilt;
+        if(seq_num)     //seq num 1
+        {
+            seq_num = 0;
+            seq0 = tilt_ev;
+        }
+        else
+        {
+            seq_num = 1;
+            seq1 = tilt_ev;
+        }
+
 
         INTCON3bits.INT2IF = 0;  //clear flag
     }
@@ -144,45 +154,103 @@ void main(void)
     //main loop
     while(1)
     {
-        switch(state)
+        switch(get_next())
         {
-            case (idle):
+            case(empty_ev):
             {
                 break;
             }
-
-            case (handle_tilt):
+            case(tilt_ev):
             {
                 check_tilt();
-
-                set_leds(green_leds);
-
-                //if all LEDS on
-                if(green_leds == 0xFF)
-                    T0CONbits.TMR0ON = 1; //play song
-                else
-                    T0CONbits.TMR0ON = 0; //stop song
-
-                    state = idle;      //return to idle state
-
-                set_leds(green_leds);
-
                 break;
             }
-
-            case(ir_respond):
+            case(shake_ev):
             {
+                green_leds = 0;
+                set_leds(green_leds);
                 break;
             }
-
-            case(speak):
+            case(tap_ev):
             {
-                handle_song();
-                state = idle;
+
+                green_leds = ((green_leds << 1) | 0x01);
+                set_leds(green_leds);
+                break;
+            }
+            case(button_ev):
+            {
                 break;
             }
         }
+
+//        switch(state)
+//        {
+//            case (idle):
+//            {
+//                break;
+//            }
+//
+//            case (handle_tilt):
+//            {
+//                check_tilt();
+//
+//                set_leds(green_leds);
+//
+//                //if all LEDS on
+//                if(green_leds == 0xFF)
+//                    T0CONbits.TMR0ON = 1; //play song
+//                else
+//                    T0CONbits.TMR0ON = 0; //stop song
+//
+//                    state = idle;      //return to idle state
+//
+//                set_leds(green_leds);
+//
+//                break;
+//            }
+//
+//            case(ir_respond):
+//            {
+//                break;
+//            }
+//
+//            case(speak):
+//            {
+//                handle_song();
+//                state = idle;
+//                break;
+//            }
+//        }
     }
+}
+
+enum Event get_next(void)
+{
+    
+    enum Event ret_ev = evBuff.front;
+
+    evBuff.front = evBuff.middle;
+    evBuff.middle = evBuff.back;
+
+    if(seq_num & 0x01)//if seq 1
+    {
+        evBuff.back = seq1;
+        seq1 = empty_ev;
+    }
+    else//else seq 0
+    {
+        evBuff.back = seq0;
+        seq0 = empty_ev;
+    }
+
+    return ret_ev;
+}
+
+void enqueue(enum Event ev)
+{
+    if(evBuff.back == empty_ev)
+        evBuff.back = ev;
 }
 
 void handle_song(void)
@@ -305,7 +373,8 @@ void check_tilt(void)
 
                //state_id = idle;
                shake_debounce = 0;
-               green_leds = 0;
+               enqueue(shake_ev);
+               //green_leds = 0;
                printf("Shaken! (count = %u)\n\r", shake_count);
             }
         }
@@ -318,22 +387,24 @@ void check_tilt(void)
         //was it tapped?
         if(tilt & tap_t)
         {
-            //unused at this point
-            tap_count++;
 
-            //turn reset if they are all on
-            if(green_leds == 0xFF)
-            {
-                green_leds = 0;
-                //state_id = idle;
-            }
-            else
-            {
-                green_leds = green_leds << 1;
-                green_leds |= 0x01;
-            }
-
-            printf("Tapped! (count = %u)\n\r", tap_count);
+            enqueue(tap_ev);
+//            //unused at this point
+//            tap_count++;
+//
+//            //turn reset if they are all on
+//            if(green_leds == 0xFF)
+//            {
+//                green_leds = 0;
+//                //state_id = idle;
+//            }
+//            else
+//            {
+//                green_leds = green_leds << 1;
+//                green_leds |= 0x01;
+//            }
+//
+//            printf("Tapped! (count = %u)\n\r", tap_count);
         }
         else
         {
