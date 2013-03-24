@@ -51,23 +51,9 @@ void low_isr(void)
 }
 
 
-//===========
-//Globals and Defines
-//===========
-#define Accel_Write_Addr 0x98
-#define Accel_Read_Addr 0x99
 
-//Logical AND these with tilt to get badge accel state
-#define alert 0x40
-#define shake 0x80
-#define tap 0x20
-#define landscape_left 0x04
-#define landscape_right 0x08
-#define vertical_invert 0x14
-#define vertical_normal 0x18
 
-//states
-typedef enum State {idle, ir_respond, ir_receive, speak, handle_tilt};
+
 
 volatile enum State state = idle;
 
@@ -143,7 +129,7 @@ void tmr0_routine(void)
 //    status_count += 1;
 //
 //    if(!status_count)
-       LATCbits.LATC1 = ~LATCbits.LATC1;
+//       LATCbits.LATC1 = ~LATCbits.LATC1;
 }
 
 //----Entry Point----
@@ -307,7 +293,7 @@ void check_accel(void)
 void check_tilt(void)
 {
         //was it shaken?
-        if(tilt & shake)
+        if(tilt & shake_t)
         {
             shake_debounce++;
 
@@ -330,7 +316,7 @@ void check_tilt(void)
         }
 
         //was it tapped?
-        if(tilt & tap)
+        if(tilt & tap_t)
         {
             //unused at this point
             tap_count++;

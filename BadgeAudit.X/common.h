@@ -15,6 +15,50 @@
 //#define C_TONE_l 0x50
 //#define Csh_TONE_l 0x5F
 
+
+
+//===========
+//Globals and Defines
+//===========
+#define Accel_Write_Addr 0x98
+#define Accel_Read_Addr 0x99
+
+//Logical AND these with tilt to get badge accel state
+#define alert_t 0x40
+#define shake_t 0x80
+#define tap_t 0x20
+#define landscape_left_t 0x04
+#define landscape_right_t 0x08
+#define vertical_invert_t 0x14
+#define vertical_normal_t 0x18
+
+//states
+typedef enum State {idle, ir_respond, ir_receive, speak, handle_tilt};
+
+typedef enum Event {empty_ev, shake_ev, tap_ev, button_ev};
+
+struct song_desc {
+    volatile unsigned char note_length;
+    volatile unsigned char song_index;
+    volatile unsigned char *song;       //point this to song array
+};
+
+struct event_buffer
+{
+    enum Event front;
+    enum Event middle;
+    enum Event back;
+};
+
+void led_setup(void);
+
+void interrupt_setup(void);
+
+void i2c_setup(void);
+
+void setup(void);
+
+
 #define D_TONE_l 0x00
 #define Dsh_TONE_l 0x0F
 
@@ -25,7 +69,6 @@
 
 #define G_TONE_l 0x2F
 #define Gsh_TONE_l 0x30
-
 
 
 #define A_TONE_h 0x3F
@@ -46,21 +89,4 @@
 #define G_TONE_h 0x8F
 #define Gsh_TONE_h 0x90
 
-struct song_desc {
-    volatile unsigned char note_length;
-    volatile unsigned char song_index;
-    volatile unsigned char *song;       //point this to song array
-};
-
-
-void led_setup(void);
-
-void interrupt_setup(void);
-
-void i2c_setup(void);
-
-void setup(void);
-
-
 #endif	/* COMMON_H */
-
