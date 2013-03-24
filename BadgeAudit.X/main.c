@@ -26,7 +26,7 @@
 char seq_num = 0;
 enum Event seq0 = empty_ev, seq1 = empty_ev;
 
-struct event_buffer evBuff = {empty_ev, empty_ev, empty_ev};
+struct event_buffer main_ev = {empty_ev, empty_ev, empty_ev};
 //===========
 //Prototypes
 //===========
@@ -37,8 +37,8 @@ void handle_song(void);
 void check_accel(void);
 void check_tilt(void);
 void set_leds(unsigned char leds);
-enum Event get_next(void);
-void enqueue(enum Event ev);
+enum Event get_next(struct event_buffer *in_ev);
+void enqueue(struct event_buffer *ev_buff, enum Event ev);
 //===========
 //Interrupt Vectors
 //===========
@@ -154,7 +154,7 @@ void main(void)
     //main loop
     while(1)
     {
-        switch(get_next())
+        switch(get_next(&main_ev))
         {
             case(empty_ev):
             {
@@ -225,32 +225,35 @@ void main(void)
     }
 }
 
-enum Event get_next(void)
+enum Event get_next(struct event_buffer *buff_ev)
 {
-    
-    enum Event ret_ev = evBuff.front;
+    //need to return the event at front of queue
+    enum Event ret_ev = buff_ev->front;
 
-    evBuff.front = evBuff.middle;
-    evBuff.middle = evBuff.back;
+    //shift events down the queue
+    buff_ev->front = buff_ev->middle;
+    buff_ev->middle = buff_ev->back;
 
+    //check correct event sequence to fill queue with
     if(seq_num & 0x01)//if seq 1
     {
-        evBuff.back = seq1;
+        buff_ev->back = seq1;
         seq1 = empty_ev;
     }
     else//else seq 0
     {
-        evBuff.back = seq0;
+        buff_ev->back = seq0;
         seq0 = empty_ev;
     }
 
     return ret_ev;
 }
 
-void enqueue(enum Event ev)
+void enqueue(struct event_buffer *buf_ev, enum Event ev)
 {
-    if(evBuff.back == empty_ev)
-        evBuff.back = ev;
+    //enqueue as far up as possible
+    if(buf_ev->back == empty_ev)
+        buf_ev->back = ev;
 }
 
 void handle_song(void)
@@ -373,7 +376,7 @@ void check_tilt(void)
 
                //state_id = idle;
                shake_debounce = 0;
-               enqueue(shake_ev);
+               enqueue(&main_ev, shake_ev);
                //green_leds = 0;
                printf("Shaken! (count = %u)\n\r", shake_count);
             }
@@ -388,7 +391,7 @@ void check_tilt(void)
         if(tilt & tap_t)
         {
 
-            enqueue(tap_ev);
+            enqueue(&main_ev, tap_ev);
 //            //unused at this point
 //            tap_count++;
 //
