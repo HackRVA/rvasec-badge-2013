@@ -50,7 +50,7 @@ struct song_desc {
     volatile unsigned char note_length;
     volatile unsigned char song_index;
     volatile unsigned char *song;       //point this to song array
-} ;
+};
 
 
 void led_setup(void);

@@ -67,13 +67,11 @@ void low_isr(void)
 #define vertical_normal 0x18
 
 //states
-#define idle 0
-#define ir_respond 1
-#define speak 2
-#define handle_tilt 3
+typedef enum State {idle, ir_respond, ir_receive, speak, handle_tilt};
+
+volatile enum State state = idle;
 
 unsigned short badge_id = 0;        //identify badges, 0 is test program
-volatile unsigned char state_id = 0;
 
 volatile unsigned char status_count = 0;
 
@@ -134,7 +132,7 @@ void lowIntHandle(void)
         tilt = ReadI2C();
 
         //make sure the upadte is handled
-        state_id = handle_tilt;
+        state = handle_tilt;
 
         INTCON3bits.INT2IF = 0;  //clear flag
     }
@@ -160,11 +158,10 @@ void main(void)
     //main loop
     while(1)
     {
-        switch(state_id)
+        switch(state)
         {
             case (idle):
             {
-                check_accel();
                 break;
             }
 
@@ -180,7 +177,7 @@ void main(void)
                 else
                     T0CONbits.TMR0ON = 0; //stop song
 
-                    state_id = idle;      //return to idle state
+                    state = idle;      //return to idle state
 
                 set_leds(green_leds);
 
@@ -195,7 +192,7 @@ void main(void)
             case(speak):
             {
                 handle_song();
-                state_id = idle;
+                state = idle;
                 break;
             }
         }
