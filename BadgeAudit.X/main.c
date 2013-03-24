@@ -19,14 +19,6 @@
 #pragma config XINST = OFF
 #pragma config CCP2MX = OFF              //CCP2 outputs to RB3 (PWM on RB3)
 
-//Notes for IR transmission
-//2.25 ms of assert for a logic 1
-//1.125 ms of zero for a logc 0
-//  - rest of the zero time is spent off
-char seq_num = 0;
-enum Event seq0 = empty_ev, seq1 = empty_ev;
-
-struct event_buffer main_ev = {empty_ev, empty_ev, empty_ev};
 //===========
 //Prototypes
 //===========
@@ -39,6 +31,7 @@ void check_tilt(void);
 void set_leds(unsigned char leds);
 enum Event get_next(struct event_buffer *in_ev);
 void enqueue(struct event_buffer *ev_buff, enum Event ev);
+
 //===========
 //Interrupt Vectors
 //===========
@@ -53,6 +46,24 @@ void low_isr(void)
 {
     _asm goto lowIntHandle _endasm
 }
+
+#pragma code
+//Notes for IR transmission
+//2.25 ms of assert for a logic 1
+//1.125 ms of zero for a logc 0
+//  - rest of the zero time is spent off
+char seq_num = 0;
+enum Event seq0 = empty_ev, seq1 = empty_ev;
+
+struct event_buffer main_ev = {NULL,        //current seq ptr
+                                empty_ev,   //seq 0
+                                empty_ev,   //seq 1
+                                empty_ev,   //back
+                                empty_ev,   //middle
+                                empty_ev};  //front
+
+
+
 
 volatile enum State state = idle;
 
@@ -116,22 +127,28 @@ void lowIntHandle(void)
         WriteI2C(Accel_Read_Addr);
         tilt = ReadI2C();
 
-        //make sure the upadte is handled
-        //state = handle_tilt;
-        if(seq_num)     //seq num 1
+        //get main loop to enqueue this event:
+        //if the current sequence is seq1
+        if(main_ev.current_seq == &main_ev.seq1)
         {
-            seq_num = 0;
-            seq0 = tilt_ev;
-        }
-        else
-        {
-            seq_num = 1;
-            seq1 = tilt_ev;
-        }
+            //tilt register event
+            main_ev.seq0 = tilt_ev;
 
+            //swap sequence to seq0
+            main_ev.current_seq = &main_ev.seq0;
+        }
+        else//else, current sequence is seq0
+        {
+            //tilt register event
+            main_ev.seq1 = tilt_ev;
+
+            //swap sequence to seq1
+            main_ev.current_seq = &main_ev.seq1;
+        }
 
         INTCON3bits.INT2IF = 0;  //clear flag
     }
+    return;
 }
 
 void tmr0_routine(void)
@@ -235,16 +252,8 @@ enum Event get_next(struct event_buffer *buff_ev)
     buff_ev->middle = buff_ev->back;
 
     //check correct event sequence to fill queue with
-    if(seq_num & 0x01)//if seq 1
-    {
-        buff_ev->back = seq1;
-        seq1 = empty_ev;
-    }
-    else//else seq 0
-    {
-        buff_ev->back = seq0;
-        seq0 = empty_ev;
-    }
+    buff_ev->back = *buff_ev->current_seq;
+    *buff_ev->current_seq = empty_ev;
 
     return ret_ev;
 }
@@ -254,6 +263,8 @@ void enqueue(struct event_buffer *buf_ev, enum Event ev)
     //enqueue as far up as possible
     if(buf_ev->back == empty_ev)
         buf_ev->back = ev;
+
+    return;
 }
 
 void handle_song(void)
@@ -372,19 +383,19 @@ void check_tilt(void)
             if(shake_debounce > 10)
             {
                //unused
-               shake_count++;
+               //shake_count++;
 
                //state_id = idle;
                shake_debounce = 0;
                enqueue(&main_ev, shake_ev);
                //green_leds = 0;
-               printf("Shaken! (count = %u)\n\r", shake_count);
+               //printf("Shaken! (count = %u)\n\r", shake_count);
             }
         }
         else//not shaken, reset counters
         {
             shake_debounce = 0;
-            shake_count = 0;
+            //shake_count = 0;
         }
 
         //was it tapped?
