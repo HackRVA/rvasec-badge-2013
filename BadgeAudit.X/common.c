@@ -72,6 +72,18 @@ void interrupt_setup(void)
     IPR1bits.TMR1IP = 1;            //Timer 1 overflow priority
     PIE1bits.TMR1IE = 1;            //Enable timer 1 overflow interrupt
 
+    //Timer 2 Setup
+//    PR2 = 0b10111011;               //set timer 2 period
+//    T2CON = 0;                      //initialize to zero
+//    T2CONbits.TMR2ON = 1;           //Turn timer 2 on
+//    T2CONbits.T2CKPS = 0b11;        //prescalar 16
+//
+//    ADCON1 = 0xf;                   //make AN* ports digital I/O
+//
+//    //set 50% duty cycle
+//    CCPR1L = 0b01011101;
+//    CCP1CON = 0b00111100;
+
     INTCONbits.PEIE = 1;            //Peripheral interrupt enable
     INTCONbits.GIE = 1;             //enable global interrupt
 
@@ -81,7 +93,7 @@ void interrupt_setup(void)
     TMR1L = 0;                      //Timer 1 counts up from 0
     TMR1H = 0;
 
-    T0CONbits.TMR0ON = 1;           //turn timer 0 on/off (1/0)
+    T0CONbits.TMR0ON = 0;           //turn timer 0 on/off (1/0)
     T1CONbits.TMR1ON = 0;           //turn timer 1 on/off (1/0)
 }
 

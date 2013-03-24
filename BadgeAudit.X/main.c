@@ -17,6 +17,7 @@
 #pragma config FOSC = XTPLL_XT
 #pragma config PBADEN = OFF
 #pragma config XINST = OFF
+#pragma config CCP2MX = OFF              //CCP2 outputs to RB3 (PWM on RB3)
 
 //Notes for IR transmission
 //2.25 ms of assert for a logic 1
@@ -29,6 +30,7 @@
 void highIntHandle(void);
 void lowIntHandle(void);
 void tmr0_routine(void);
+void handle_song(void);
 void check_accel(void);
 void check_tilt(void);
 void set_leds(unsigned char leds);
@@ -74,7 +76,6 @@ unsigned short badge_id = 0;        //identify badges, 0 is test program
 volatile unsigned char state_id = 0;
 
 volatile unsigned char status_count = 0;
-=======
 
 volatile unsigned char green_leds = 0;
 
@@ -104,61 +105,14 @@ struct song_desc *playing;
 #pragma interrupt highIntHandle
 void highIntHandle(void)
 {
+      //timer 0 flag
       if(INTCONbits.TMR0IF)
       {
-          timer0_count += 1;
-
-          //has the note been playing long enough?
-          if(playing->note_length == timer0_count)
-          {
-              //at the end of the song?
-              if(playing->song_index < SONG_SIZE - 1)
-              {
-                  //move to next note
-                  playing->song_index += 1;
-              }
-              else//start song over
-              {
-                  playing->song_index = 0;
-              }
-              
-              //reset counter
-              timer0_count = 0;
-          }
-          else//keep playing note
-          {
-              timer0_count += 1;
-          }
-          
-          //if note not a rest
-          if(playing->song[playing->song_index])
-          {
-                TMR0H = playing->song[playing->song_index];
-                TMR0L = TONE_LOW_BYTE;
-
-                //play tone
-                LATBbits.LATB3 = ~LATBbits.LATB3;
-          }
-          else
-          {
-              TMR0H = A_TONE_h;
-              TMR0L = TONE_LOW_BYTE;
-
-              //keep speaker off
-              LATBbits.LATB3 = 0;
-          }
-
-          //clear interrupt flag
-          INTCONbits.TMR0IF = 0;
+          //state_id = speak;
+          handle_song();
       }
       else
-<<<<<<< HEAD
-      {
-
-      }  
-=======
       {}
->>>>>>> origin/master
 }
 
 #pragma interruptlow lowIntHandle
@@ -194,6 +148,7 @@ void tmr0_routine(void)
        LATCbits.LATC1 = ~LATCbits.LATC1;
 }
 
+//----Entry Point----
 void main(void)
 {
     //set the starting song
@@ -209,15 +164,15 @@ void main(void)
         {
             case (idle):
             {
+                check_accel();
                 break;
             }
 
             case (handle_tilt):
             {
                 check_tilt();
-<<<<<<< HEAD
+
                 set_leds(green_leds);
-=======
 
                 //if all LEDS on
                 if(green_leds == 0xFF)
@@ -228,8 +183,7 @@ void main(void)
                     state_id = idle;      //return to idle state
 
                 set_leds(green_leds);
-                
->>>>>>> origin/master
+
                 break;
             }
 
@@ -240,15 +194,60 @@ void main(void)
 
             case(speak):
             {
-                //toggle speaker port to create buzz
-                //LATBbits.LATB3 = ~LATBbits.LATB3;
-
-                //PIC is way faster than Piezo freq
-                //Delay10KTCYx(4);
+                handle_song();
+                state_id = idle;
                 break;
             }
         }
     }
+}
+
+void handle_song(void)
+{
+  timer0_count += 1;
+
+  //has the note been playing long enough?
+  if(playing->note_length == timer0_count)
+  {
+      //at the end of the song?
+      if(playing->song_index < SONG_SIZE - 1)
+      {
+          //move to next note
+          playing->song_index += 1;
+      }
+      else//start song over
+      {
+          playing->song_index = 0;
+      }
+
+      //reset counter
+      timer0_count = 0;
+  }
+  else//keep playing note
+  {
+      timer0_count += 1;
+  }
+
+  //if note not a rest
+  if(playing->song[playing->song_index])
+  {
+        TMR0H = playing->song[playing->song_index];
+        TMR0L = TONE_LOW_BYTE;
+
+        //play tone
+        LATBbits.LATB3 = ~LATBbits.LATB3;
+  }
+  else
+  {
+      TMR0H = A_TONE_h;
+      TMR0L = TONE_LOW_BYTE;
+
+      //keep speaker off
+      LATBbits.LATB3 = 0;
+  }
+
+  //clear interrupt flag
+  INTCONbits.TMR0IF = 0;
 }
 
 void check_accel(void)
