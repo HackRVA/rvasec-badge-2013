@@ -135,13 +135,13 @@ void i2c_setup(void)
     StartI2C();
         WriteI2C(0x98);
         WriteI2C(0x08);                //SR register
-        WriteI2C(0x00);                //Sample rate at 32/sec
+        WriteI2C(0x00);                //Sample rate at 120/sec
     StopI2C();
     IdleI2C();
     StartI2C();
         WriteI2C(0x98);
         WriteI2C(0x0A);                //PD register
-        WriteI2C(0x2F);                //test tap detection, debounce
+        WriteI2C(0x40);                // tap detection debounce
     StopI2C();
     IdleI2C();
     StartI2C();

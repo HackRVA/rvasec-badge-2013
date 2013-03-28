@@ -114,49 +114,17 @@ void lowIntHandle(void)
 {
     if(INTCON3bits.INT2IF) //check for INT2 (B2-Accel INT)
     {
-        //use I2C to read accelerometer's tilt register
-        StartI2C();
+         INTCON3bits.INT2IF = 0;  //clear flag
 
-        //Tell Badge we want tilt register
-        WriteI2C(Accel_Write_Addr);
-        WriteI2C(0x03);
-
-        RestartI2C();
-
-        //Get the the contents of tilt register
-        WriteI2C(Accel_Read_Addr);
-        tilt = ReadI2C();
-
-        //get main loop to enqueue this event:
-        //if the current sequence is seq1
-        if(main_ev.current_seq == &main_ev.seq1)
-        {
-            //tilt register event
-            main_ev.seq0 = tilt_ev;
-
-            //swap sequence to seq0
-            main_ev.current_seq = &main_ev.seq0;
-        }
-        else//else, current sequence is seq0
-        {
-            //tilt register event
-            main_ev.seq1 = tilt_ev;
-
-            //swap sequence to seq1
-            main_ev.current_seq = &main_ev.seq1;
-        }
-
-        INTCON3bits.INT2IF = 0;  //clear flag
+         check_tilt();
+      
     }
     return;
 }
 
 void tmr0_routine(void)
 {
-//    status_count += 1;
-//
-//    if(!status_count)
-//       LATCbits.LATC1 = ~LATCbits.LATC1;
+
 }
 
 //----Entry Point----
@@ -374,6 +342,19 @@ void check_accel(void)
 
 void check_tilt(void)
 {
+         //use I2C to read accelerometer's tilt register
+        StartI2C();
+
+        //Tell Badge we want tilt register
+        WriteI2C(Accel_Write_Addr);
+        WriteI2C(0x03);
+
+        RestartI2C();
+
+        //Get the the contents of tilt register
+        WriteI2C(Accel_Read_Addr);
+        tilt = ReadI2C();
+
         //was it shaken?
         if(tilt & shake_t)
         {
