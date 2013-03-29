@@ -164,7 +164,7 @@ void main(void)
             }
             case(tap_ev):
             {
-                green_leds = ((green_leds << 1) | 0x01);
+                green_leds +=1; //((green_leds << 1) | 0x01);
                 set_leds(green_leds);
                 break;
             }
@@ -176,7 +176,15 @@ void main(void)
             {
                 if(leds_mode == startup)
                 {
-                    led_seq_Loading();
+                    //disable interrupts
+                    INTCONbits.GIE = 0;
+                        led_seq_Loading();
+                    //enable interrupts
+                    INTCONbits.GIE = 1;
+
+                    //make sure to check tilit if it fired during demo
+                    if(INTCON3bits.INT2IF == 1)
+                        check_tilt();
                 }
                 else if (leds_mode == cylon)
                 {
@@ -342,20 +350,13 @@ void check_tilt(void)
             //must get 10 shake samples to register
             if(shake_debounce > 10)
             {
-               //unused
-               //shake_count++;
-
-               //state_id = idle;
                shake_debounce = 0;
                enqueue(&main_ev, shake_ev);
-               //green_leds = 0;
-               //printf("Shaken! (count = %u)\n\r", shake_count);
             }
         }
         else//not shaken, reset counters
         {
             shake_debounce = 0;
-            //shake_count = 0;
         }
 
         //was it tapped?
@@ -363,22 +364,6 @@ void check_tilt(void)
         {
 
             enqueue(&main_ev, tap_ev);
-//            //unused at this point
-//            tap_count++;
-//
-//            //turn reset if they are all on
-//            if(green_leds == 0xFF)
-//            {
-//                green_leds = 0;
-//                //state_id = idle;
-//            }
-//            else
-//            {
-//                green_leds = green_leds << 1;
-//                green_leds |= 0x01;
-//            }
-//
-//            printf("Tapped! (count = %u)\n\r", tap_count);
         }
         else
         {
