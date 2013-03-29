@@ -32,6 +32,7 @@ void set_leds(unsigned char leds);
 enum Event get_next(struct event_buffer *in_ev);
 void enqueue(struct event_buffer *ev_buff, enum Event ev);
 void led_seq_Loading(void);
+void led_seq_Cylon(void);
 
 //===========
 //Interrupt Vectors
@@ -164,8 +165,15 @@ void main(void)
             }
             case(tap_ev):
             {
-                green_leds +=1; //((green_leds << 1) | 0x01);
+                green_leds +=1;
                 set_leds(green_leds);
+
+                //enter cylon mode if they reach 255
+                if(green_leds == 10)
+                {
+                    leds_mode = cylon;
+                    enqueue(&main_ev,led);
+                }
                 break;
             }
             case(button_ev):
@@ -188,7 +196,16 @@ void main(void)
                 }
                 else if (leds_mode == cylon)
                 {
+                    //disable interrupts
+                    INTCONbits.GIE = 0;
+                        led_seq_Cylon();
+                        
+                    //disable interrupts
+                    INTCONbits.GIE = 1;
 
+                    //make sure to check tilit if it fired during demo
+                    if(INTCON3bits.INT2IF == 1)
+                        check_tilt();
                 }
 
                 break;
@@ -434,4 +451,63 @@ void led_seq_Loading(void)
     set_leds(0xFF);
         Delay10KTCYx(20);
     set_leds(0x0);
+}
+
+void led_seq_Cylon(void)
+{
+    int i = 0;
+
+    for(i = 0; i < 10; i++)
+    {
+        set_leds(0x1);
+            Delay10KTCYx(100);
+
+        set_leds(0x3);
+            Delay10KTCYx(50);
+        set_leds(0x2);
+            Delay10KTCYx(50);
+            
+        set_leds(0x07);
+            Delay10KTCYx(25);
+        set_leds(0x06);
+            Delay10KTCYx(25);
+        set_leds(0x04);
+            Delay10KTCYx(50);
+
+        set_leds(0x0E);
+            Delay10KTCYx(25);
+        set_leds(0x0C);
+            Delay10KTCYx(25);
+        set_leds(0x08);
+            Delay10KTCYx(50);
+            
+        set_leds(0x1C);
+            Delay10KTCYx(25);
+        set_leds(0x18);
+            Delay10KTCYx(25);
+        set_leds(0x10);
+            Delay10KTCYx(50);
+
+        set_leds(0x38);
+            Delay10KTCYx(25);
+        set_leds(0x30);
+            Delay10KTCYx(25);
+        set_leds(0x20);
+            Delay10KTCYx(50);
+
+        set_leds(0x70);
+            Delay10KTCYx(25);
+        set_leds(0x60);
+            Delay10KTCYx(25);
+        set_leds(0x40);
+            Delay10KTCYx(50);
+
+        set_leds(0xE0);
+            Delay10KTCYx(25);
+        set_leds(0xC0);
+            Delay10KTCYx(25);
+        set_leds(0x80);
+            Delay10KTCYx(50);
+    }
+    
 }
