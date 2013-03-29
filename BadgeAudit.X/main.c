@@ -31,6 +31,7 @@ void check_tilt(void);
 void set_leds(unsigned char leds);
 enum Event get_next(struct event_buffer *in_ev);
 void enqueue(struct event_buffer *ev_buff, enum Event ev);
+void led_seq_Loading(void);
 
 //===========
 //Interrupt Vectors
@@ -62,7 +63,8 @@ struct event_buffer main_ev = {NULL,        //current seq ptr
                                 empty_ev,   //middle
                                 empty_ev};  //front
 
-
+//may want buffer for led?
+enum LED_mode leds_mode = startup;
 
 
 volatile enum State state = idle;
@@ -116,8 +118,7 @@ void lowIntHandle(void)
     {
          INTCON3bits.INT2IF = 0;  //clear flag
 
-         check_tilt();
-      
+         check_tilt(); 
     }
     return;
 }
@@ -135,6 +136,11 @@ void main(void)
     
     //initialize all the things
     setup();
+
+    //do the set led event
+    enqueue(&main_ev, led);
+
+    enqueue(&main_ev, idle);
 
     //main loop
     while(1)
@@ -158,7 +164,6 @@ void main(void)
             }
             case(tap_ev):
             {
-
                 green_leds = ((green_leds << 1) | 0x01);
                 set_leds(green_leds);
                 break;
@@ -167,46 +172,20 @@ void main(void)
             {
                 break;
             }
-        }
+            case(led):
+            {
+                if(leds_mode == startup)
+                {
+                    led_seq_Loading();
+                }
+                else if (leds_mode == cylon)
+                {
 
-//        switch(state)
-//        {
-//            case (idle):
-//            {
-//                break;
-//            }
-//
-//            case (handle_tilt):
-//            {
-//                check_tilt();
-//
-//                set_leds(green_leds);
-//
-//                //if all LEDS on
-//                if(green_leds == 0xFF)
-//                    T0CONbits.TMR0ON = 1; //play song
-//                else
-//                    T0CONbits.TMR0ON = 0; //stop song
-//
-//                    state = idle;      //return to idle state
-//
-//                set_leds(green_leds);
-//
-//                break;
-//            }
-//
-//            case(ir_respond):
-//            {
-//                break;
-//            }
-//
-//            case(speak):
-//            {
-//                handle_song();
-//                state = idle;
-//                break;
-//            }
-//        }
+                }
+
+                break;
+            }
+        }
     }
 }
 
@@ -419,4 +398,55 @@ void set_leds(unsigned char leds)
     PORTC = (leds >>6) | 0x04;
         
     return;
+}
+
+void led_seq_Loading(void)
+{
+    set_leds(0x01);
+        Delay10KTCYx(200);
+    set_leds(0x03);
+        Delay10KTCYx(200);
+    set_leds(0x07);
+        Delay10KTCYx(200);
+    set_leds(0x0F);
+        Delay10KTCYx(200);
+
+    set_leds(0x1F);
+        Delay10KTCYx(200);
+    set_leds(0x3F);
+        Delay10KTCYx(200);
+    set_leds(0x7F);
+        Delay10KTCYx(200);
+    set_leds(0xFF);
+        Delay10KTCYx(200);
+
+    set_leds(0x0);
+        Delay10KTCYx(200);
+    set_leds(0xFF);
+        Delay10KTCYx(200);
+    set_leds(0x0);
+        Delay10KTCYx(150);
+    set_leds(0xFF);
+        Delay10KTCYx(150);
+    set_leds(0x0);
+        Delay10KTCYx(100);
+    set_leds(0xFF);
+        Delay10KTCYx(100);
+    set_leds(0x0);
+        Delay10KTCYx(050);
+    set_leds(0xFF);
+        Delay10KTCYx(050);
+    set_leds(0x0);
+        Delay10KTCYx(40);
+    set_leds(0xFF);
+        Delay10KTCYx(40);
+    set_leds(0x0);
+        Delay10KTCYx(20);
+    set_leds(0xFF);
+        Delay10KTCYx(20);
+    set_leds(0x0);
+        Delay10KTCYx(20);
+    set_leds(0xFF);
+        Delay10KTCYx(20);
+    set_leds(0x0);
 }

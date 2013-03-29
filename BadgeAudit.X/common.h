@@ -35,7 +35,9 @@
 //states
 typedef enum State {idle, ir_respond, ir_receive, speak, handle_tilt};
 
-typedef enum Event {empty_ev, tilt_ev, shake_ev, tap_ev, button_ev};
+typedef enum LED_mode {startup, cylon};
+
+typedef enum Event {empty_ev, tilt_ev, shake_ev, tap_ev, button_ev, led};
 
 struct song_desc {
     volatile unsigned char note_length;
