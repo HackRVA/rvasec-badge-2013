@@ -404,110 +404,87 @@ void set_leds(unsigned char leds)
 
 void led_seq_Loading(void)
 {
-    set_leds(0x01);
-        Delay10KTCYx(200);
-    set_leds(0x03);
-        Delay10KTCYx(200);
-    set_leds(0x07);
-        Delay10KTCYx(200);
-    set_leds(0x0F);
-        Delay10KTCYx(200);
+    short int i = 0;
+    unsigned char led = 0x00;
 
-    set_leds(0x1F);
-        Delay10KTCYx(200);
-    set_leds(0x3F);
-        Delay10KTCYx(200);
-    set_leds(0x7F);
-        Delay10KTCYx(200);
-    set_leds(0xFF);
-        Delay10KTCYx(200);
+    for(i = 0; i <= 8; i++)
+    {
+        set_leds(led);
+            Delay10KTCYx(200 - (i << i));
+        led = (led << 1) | 0x01;
+    }
 
-    set_leds(0x0);
-        Delay10KTCYx(200);
-    set_leds(0xFF);
-        Delay10KTCYx(200);
-    set_leds(0x0);
-        Delay10KTCYx(150);
-    set_leds(0xFF);
-        Delay10KTCYx(150);
-    set_leds(0x0);
-        Delay10KTCYx(100);
-    set_leds(0xFF);
-        Delay10KTCYx(100);
-    set_leds(0x0);
-        Delay10KTCYx(050);
-    set_leds(0xFF);
-        Delay10KTCYx(050);
-    set_leds(0x0);
-        Delay10KTCYx(40);
-    set_leds(0xFF);
-        Delay10KTCYx(40);
-    set_leds(0x0);
-        Delay10KTCYx(20);
-    set_leds(0xFF);
-        Delay10KTCYx(20);
-    set_leds(0x0);
-        Delay10KTCYx(20);
-    set_leds(0xFF);
-        Delay10KTCYx(20);
+    for(i = 100; i >= 10; i-=10)
+    {
+        set_leds(0x0);
+            Delay10KTCYx(i);
+        set_leds(0xFF);
+            Delay10KTCYx(i);
+    }
+
     set_leds(0x0);
 }
 
 void led_seq_Cylon(void)
 {
-    int i = 0;
+    short i = 0, j = 0, k = 0;
+    unsigned char delay = 100;
+    unsigned char led1 = 0x04, led2 = 0x06, led3 = 0x07;
 
+    //do led animation 10 times
     for(i = 0; i < 10; i++)
     {
-        set_leds(0x1);
-            Delay10KTCYx(100);
+        //go down the 8 LEDS
+        for(j = 0; j < 8; j++)
+        {
+            //bit bang dimming
+            for(k = 0; k < 10; k++)
+            {
+                set_leds(led3);
+                Delay1KTCYx(delay>>4);
 
-        set_leds(0x3);
-            Delay10KTCYx(50);
-        set_leds(0x2);
-            Delay10KTCYx(50);
-            
-        set_leds(0x07);
-            Delay10KTCYx(25);
-        set_leds(0x06);
-            Delay10KTCYx(25);
-        set_leds(0x04);
-            Delay10KTCYx(50);
+                set_leds(led2);
+                Delay1KTCYx(delay>>2);
 
-        set_leds(0x0E);
-            Delay10KTCYx(25);
-        set_leds(0x0C);
-            Delay10KTCYx(25);
-        set_leds(0x08);
-            Delay10KTCYx(50);
-            
-        set_leds(0x1C);
-            Delay10KTCYx(25);
-        set_leds(0x18);
-            Delay10KTCYx(25);
-        set_leds(0x10);
-            Delay10KTCYx(50);
+                set_leds(led1);
+                Delay1KTCYx(delay);
+            }
 
-        set_leds(0x38);
-            Delay10KTCYx(25);
-        set_leds(0x30);
-            Delay10KTCYx(25);
-        set_leds(0x20);
-            Delay10KTCYx(50);
+            led1 = led1 << 1;
+            led2 = led2 << 1;
+            led3 = led3 << 1;
+        }
 
-        set_leds(0x70);
-            Delay10KTCYx(25);
-        set_leds(0x60);
-            Delay10KTCYx(25);
-        set_leds(0x40);
-            Delay10KTCYx(50);
+        //set leds for starting at the end
+        led1 = 0x20;
+        led2 = 0x60;
+        led3 = 0xE0;
 
-        set_leds(0xE0);
-            Delay10KTCYx(25);
-        set_leds(0xC0);
-            Delay10KTCYx(25);
-        set_leds(0x80);
-            Delay10KTCYx(50);
+        //go back across 8 LEDS
+        for(j = 0; j < 8; j++)
+        {
+            //bit bang dimming
+            for(k = 0; k < 10; k++)
+            {
+                set_leds(led3);
+                Delay1KTCYx(delay>>4);
+
+                set_leds(led2);
+                Delay1KTCYx(delay>>2);
+
+                set_leds(led1);
+                Delay1KTCYx(delay);
+            }
+
+            led1 = led1 >> 1;
+            led2 = led2 >> 1;
+            led3 = led3 >> 1;
+        }
+
+        //reset leds to start
+        led1 = 0x04;
+        led2 = 0x06;
+        led3 = 0x07;
     }
-    
+
 }
