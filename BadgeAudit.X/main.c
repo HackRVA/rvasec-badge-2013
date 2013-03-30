@@ -184,30 +184,16 @@ void main(void)
             {
                 if(leds_mode == startup)
                 {
-                    //disable interrupts
-                    INTCONbits.GIE = 0;
+                    ATOMIC_BEGIN
                         led_seq_Loading();
-                    //enable interrupts
-                    INTCONbits.GIE = 1;
-
-                    //make sure to check tilit if it fired during demo
-                    if(INTCON3bits.INT2IF == 1)
-                        check_tilt();
+                    ATOMIC_END
                 }
                 else if (leds_mode == cylon)
                 {
-                    //disable interrupts
-                    INTCONbits.GIE = 0;
+                    ATOMIC_BEGIN
                         led_seq_Cylon();
-                        
-                    //disable interrupts
-                    INTCONbits.GIE = 1;
-
-                    //make sure to check tilit if it fired during demo
-                    if(INTCON3bits.INT2IF == 1)
-                        check_tilt();
+                    ATOMIC_END
                 }
-
                 break;
             }
         }

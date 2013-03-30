@@ -8,14 +8,10 @@
 #define	COMMON_H
 #define TONE_LOW_BYTE 0x0f
 
-//#define A_TONE_l 0x3F
-//#define Ash_TONE_l 0x40
-//
-//#define B_TONE_l 0x4F
-//#define C_TONE_l 0x50
-//#define Csh_TONE_l 0x5F
-
-
+#define ATOMIC_BEGIN INTCONbits.GIE = 0;
+#define ATOMIC_END INTCONbits.GIE = 1;\
+                   if(INTCON3bits.INT2IF == 1)\
+                        check_tilt();
 
 //===========
 //Globals and Defines
