@@ -46,7 +46,7 @@ void interrupt_setup(void)
     //Port B interrupt
     INTCON3bits.INT2IP = 0;         //INT2 low priority
     INTCON3bits.INT2IF = 0;         //Clear INT2 flag
-    INTCON2bits.RBPU = 1;           //pull up enable
+    INTCON2bits.RBPU = 0;           //pull up disable
     INTCON2bits.INTEDG2 = 0;        //rising/falling (1/0)
     INTCON3bits.INT2IE = 1;         //Enable INT2
 
@@ -141,7 +141,7 @@ void i2c_setup(void)
     StartI2C();
         WriteI2C(0x98);
         WriteI2C(0x0A);                //PD register
-        WriteI2C(0x40);                // tap detection debounce
+        WriteI2C(0x3F);                // tap detection debounce
     StopI2C();
     IdleI2C();
     StartI2C();
