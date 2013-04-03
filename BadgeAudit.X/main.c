@@ -139,9 +139,12 @@ void main(void)
     setup();
 
     //do the set led event
-    enqueue(&main_ev, led);
+    enqueue(&main_ev, led_ev);
 
-    enqueue(&main_ev, idle);
+//    leds_mode = cylon;
+//    enqueue(&main_ev,led);
+
+    //enqueue(&main_ev, idle);
 
     //main loop
     while(1)
@@ -172,7 +175,7 @@ void main(void)
                 if(green_leds == 10)
                 {
                     leds_mode = cylon;
-                    enqueue(&main_ev,led);
+                    enqueue(&main_ev,led_ev);
                 }
                 break;
             }
@@ -180,7 +183,7 @@ void main(void)
             {
                 break;
             }
-            case(led):
+            case(led_ev):
             {
                 if(leds_mode == startup)
                 {
@@ -390,87 +393,94 @@ void set_leds(unsigned char leds)
 
 void led_seq_Loading(void)
 {
-    short int i = 0;
+    static unsigned char i = 0;
     unsigned char led = 0x00;
 
-    for(i = 0; i <= 8; i++)
+    if(i < 8)
     {
-        set_leds(led);
-            Delay10KTCYx(200 - (i << i));
-        led = (led << 1) | 0x01;
-    }
+        led = 0xFF >> (7 - i);
 
-    for(i = 100; i >= 10; i-=10)
+        set_leds(led);
+
+        Delay10KTCYx(200 - (i << i));
+
+        i++;
+        enqueue(&main_ev, led_ev);
+    }
+    else if(i < 95)
     {
         set_leds(0x0);
-            Delay10KTCYx(i);
+        Delay10KTCYx(100 - i);
         set_leds(0xFF);
-            Delay10KTCYx(i);
+        Delay10KTCYx(100 - i);
+        i += 5;
+        enqueue(&main_ev, led_ev);
     }
-
-    set_leds(0x0);
+    else
+        set_leds(0x0);
 }
-
+ 
 void led_seq_Cylon(void)
 {
-    short i = 0, j = 0, k = 0;
+    static unsigned char i = 0, j = 0;
+    short k = 0;
     unsigned char delay = 100;
     unsigned char led1 = 0x04, led2 = 0x06, led3 = 0x07;
 
-    //do led animation 10 times
-    for(i = 0; i < 10; i++)
+    //count moving one wav
+    if(j < 8)
     {
-        //go down the 8 LEDS
-        for(j = 0; j < 8; j++)
+        led1 = led1 << j;
+        led2 = led2 << j;
+        led3 = led3 << j;
+
+        //bit bang dimming
+        for(k = 0; k < 10; k++)
         {
-            //bit bang dimming
-            for(k = 0; k < 10; k++)
-            {
-                set_leds(led3);
-                Delay1KTCYx(delay>>4);
+            set_leds(led3);
+            Delay1KTCYx(delay>>4);
 
-                set_leds(led2);
-                Delay1KTCYx(delay>>2);
+            set_leds(led2);
+            Delay1KTCYx(delay>>2);
 
-                set_leds(led1);
-                Delay1KTCYx(delay);
-            }
-
-            led1 = led1 << 1;
-            led2 = led2 << 1;
-            led3 = led3 << 1;
+            set_leds(led1);
+            Delay1KTCYx(delay);
         }
+        j++;
+    }
+    else if (j < 16)
+    {
+      //set leds for starting at the end
+      led1 = 0x20 >> j - 8;
+      led2 = 0x60 >> j - 8;
+      led3 = 0xE0 >> j - 8;
 
-        //set leds for starting at the end
-        led1 = 0x20;
-        led2 = 0x60;
-        led3 = 0xE0;
+      //bit bang dimming
+      for(k = 0; k < 10; k++)
+      {
+          set_leds(led3);
+          Delay1KTCYx(delay>>4);
 
-        //go back across 8 LEDS
-        for(j = 0; j < 8; j++)
-        {
-            //bit bang dimming
-            for(k = 0; k < 10; k++)
-            {
-                set_leds(led3);
-                Delay1KTCYx(delay>>4);
+          set_leds(led2);
+          Delay1KTCYx(delay>>2);
 
-                set_leds(led2);
-                Delay1KTCYx(delay>>2);
-
-                set_leds(led1);
-                Delay1KTCYx(delay);
-            }
-
-            led1 = led1 >> 1;
-            led2 = led2 >> 1;
-            led3 = led3 >> 1;
-        }
-
-        //reset leds to start
-        led1 = 0x04;
-        led2 = 0x06;
-        led3 = 0x07;
+          set_leds(led1);
+          Delay1KTCYx(delay);
+      }
+      j++;
+    }
+    else
+    {
+      j = 0;
+      i++;
     }
 
+    //do it four times
+    if(i < 4)
+    {
+        //not done, run it again
+       enqueue(&main_ev, led_ev);
+    }
+    else
+        i = 0;
 }
