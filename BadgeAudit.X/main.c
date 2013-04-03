@@ -50,10 +50,7 @@ void low_isr(void)
 }
 
 #pragma code
-//Notes for IR transmission
-//2.25 ms of assert for a logic 1
-//1.125 ms of zero for a logc 0
-//  - rest of the zero time is spent off
+
 char seq_num = 0;
 enum Event seq0 = empty_ev, seq1 = empty_ev;
 
@@ -141,11 +138,6 @@ void main(void)
     //do the set led event
     enqueue(&main_ev, led_ev);
 
-//    leds_mode = cylon;
-//    enqueue(&main_ev,led);
-
-    //enqueue(&main_ev, idle);
-
     //main loop
     while(1)
     {
@@ -222,7 +214,11 @@ enum Event get_next(struct event_buffer *buff_ev)
 void enqueue(struct event_buffer *buf_ev, enum Event ev)
 {
     //enqueue as far up as possible
-    if(buf_ev->back == empty_ev)
+    if(buf_ev->front == empty_ev)
+        buf_ev->front = ev;
+    else if(buf_ev->middle == empty_ev)
+        buf_ev->middle = ev;
+    else if(buf_ev->back == empty_ev)
         buf_ev->back = ev;
 
     return;
@@ -335,46 +331,46 @@ void check_accel(void)
 
 void check_tilt(void)
 {
-         //use I2C to read accelerometer's tilt register
-        StartI2C();
+     //use I2C to read accelerometer's tilt register
+    StartI2C();
 
-        //Tell Badge we want tilt register
-        WriteI2C(Accel_Write_Addr);
-        WriteI2C(0x03);
+    //Tell Badge we want tilt register
+    WriteI2C(Accel_Write_Addr);
+    WriteI2C(0x03);
 
-        RestartI2C();
+    RestartI2C();
 
-        //Get the the contents of tilt register
-        WriteI2C(Accel_Read_Addr);
-        tilt = ReadI2C();
+    //Get the the contents of tilt register
+    WriteI2C(Accel_Read_Addr);
+    tilt = ReadI2C();
 
-        //was it shaken?
-        if(tilt & shake_t)
+    //was it shaken?
+    if(tilt & shake_t)
+    {
+        shake_debounce++;
+
+        //must get 10 shake samples to register
+        if(shake_debounce > 10)
         {
-            shake_debounce++;
+           shake_debounce = 0;
+           enqueue(&main_ev, shake_ev);
+        }
+    }
+    else//not shaken, reset counters
+    {
+        shake_debounce = 0;
+    }
 
-            //must get 10 shake samples to register
-            if(shake_debounce > 10)
-            {
-               shake_debounce = 0;
-               enqueue(&main_ev, shake_ev);
-            }
-        }
-        else//not shaken, reset counters
-        {
-            shake_debounce = 0;
-        }
+    //was it tapped?
+    if(tilt & tap_t)
+    {
 
-        //was it tapped?
-        if(tilt & tap_t)
-        {
-
-            enqueue(&main_ev, tap_ev);
-        }
-        else
-        {
-            tap_count = 0;
-        }
+        enqueue(&main_ev, tap_ev);
+    }
+    else
+    {
+        tap_count = 0;
+    }
         
 
     return;
@@ -393,85 +389,88 @@ void set_leds(unsigned char leds)
 
 void led_seq_Loading(void)
 {
+    //persistent count
     static unsigned char i = 0;
     unsigned char led = 0x00;
 
+    //slowly light the 8 leds (first one starts on)
     if(i < 8)
     {
+        //shift out less and less
         led = 0xFF >> (7 - i);
-
         set_leds(led);
 
+        //the "load" gets faster and faster
         Delay10KTCYx(200 - (i << i));
 
-        i++;
+        //sequence not over
         enqueue(&main_ev, led_ev);
+        
+        i++;
     }
+    //accelerating blink
     else if(i < 95)
     {
         set_leds(0x0);
-        Delay10KTCYx(100 - i);
+            Delay10KTCYx(100 - i);
         set_leds(0xFF);
-        Delay10KTCYx(100 - i);
+            Delay10KTCYx(100 - i);
         i += 5;
+
+        //still not done
         enqueue(&main_ev, led_ev);
     }
     else
-        set_leds(0x0);
+        set_leds(0x0); //all done
 }
  
 void led_seq_Cylon(void)
 {
+    //persistent state of the sequence
     static unsigned char i = 0, j = 0;
     short k = 0;
     unsigned char delay = 100;
-    unsigned char led1 = 0x04, led2 = 0x06, led3 = 0x07;
 
-    //count moving one wav
+    //count moving top to bottom
     if(j < 8)
     {
-        led1 = led1 << j;
-        led2 = led2 << j;
-        led3 = led3 << j;
-
         //bit bang dimming
         for(k = 0; k < 10; k++)
         {
-            set_leds(led3);
+            set_leds(0x07 << j);
             Delay1KTCYx(delay>>4);
 
-            set_leds(led2);
+            set_leds(0x06 << j);
             Delay1KTCYx(delay>>2);
 
-            set_leds(led1);
+            set_leds(0x04 << j);
             Delay1KTCYx(delay);
         }
         j++;
     }
+    //count moving bottom to top
     else if (j < 16)
     {
-      //set leds for starting at the end
-      led1 = 0x20 >> j - 8;
-      led2 = 0x60 >> j - 8;
-      led3 = 0xE0 >> j - 8;
-
       //bit bang dimming
       for(k = 0; k < 10; k++)
       {
-          set_leds(led3);
+          set_leds(0xE0 >> j - 8);
           Delay1KTCYx(delay>>4);
 
-          set_leds(led2);
+          set_leds(0x60 >> j - 8);
           Delay1KTCYx(delay>>2);
 
-          set_leds(led1);
+          set_leds( 0x20 >> j - 8);
           Delay1KTCYx(delay);
       }
       j++;
     }
+    //one oscilation completed
     else
     {
       j = 0;
+
+      //i counts number of repeats
       i++;
     }
 
@@ -482,5 +481,5 @@ void led_seq_Cylon(void)
        enqueue(&main_ev, led_ev);
     }
     else
-        i = 0;
+        i = 0; //all done
 }
