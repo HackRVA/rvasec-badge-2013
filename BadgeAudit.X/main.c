@@ -51,8 +51,8 @@ void low_isr(void)
 
 #pragma code
 
-char seq_num = 0;
-enum Event seq0 = empty_ev, seq1 = empty_ev;
+//char seq_num = 0;
+//enum Event seq0 = empty_ev, seq1 = empty_ev;
 
 struct event_buffer main_ev = {NULL,        //current seq ptr
                                 empty_ev,   //seq 0
@@ -64,14 +64,17 @@ struct event_buffer main_ev = {NULL,        //current seq ptr
 //may want buffer for led?
 enum LED_mode leds_mode = startup;
 
-
 volatile enum State state = idle;
 
 unsigned short badge_id = 0;        //identify badges, 0 is test program
 
-volatile unsigned char status_count = 0;
+//volatile unsigned char status_count = 0;
 
 volatile unsigned char green_leds = 0;
+
+volatile unsigned char int_tilt_count = 0;
+
+volatile unsigned char main_tilt_count = 0;
 
 //Accelerometer related vars
 unsigned char xA, yA, zA,           //Accel vectors
@@ -116,7 +119,8 @@ void lowIntHandle(void)
     {
          INTCON3bits.INT2IF = 0;  //clear flag
 
-         check_tilt(); 
+         int_tilt_count++;
+         //check_tilt();
     }
     return;
 }
@@ -179,15 +183,15 @@ void main(void)
             {
                 if(leds_mode == startup)
                 {
-                    ATOMIC_BEGIN
+                    //ATOMIC_BEGIN
                         led_seq_Loading();
-                    ATOMIC_END
+                    //ATOMIC_END
                 }
                 else if (leds_mode == cylon)
                 {
-                    ATOMIC_BEGIN
+                    //ATOMIC_BEGIN
                         led_seq_Cylon();
-                    ATOMIC_END
+                    //ATOMIC_END
                 }
                 break;
             }
@@ -205,8 +209,14 @@ enum Event get_next(struct event_buffer *buff_ev)
     buff_ev->middle = buff_ev->back;
 
     //check correct event sequence to fill queue with
-    buff_ev->back = *buff_ev->current_seq;
-    *buff_ev->current_seq = empty_ev;
+    //buff_ev->back = *buff_ev->current_seq;
+    if(main_tilt_count == int_tilt_count)
+        buff_ev->back = empty_ev;
+    else
+    {
+        main_tilt_count++;
+        buff_ev->back = tilt_ev;
+    }
 
     return ret_ev;
 }
@@ -364,7 +374,6 @@ void check_tilt(void)
     //was it tapped?
     if(tilt & tap_t)
     {
-
         enqueue(&main_ev, tap_ev);
     }
     else
@@ -372,7 +381,6 @@ void check_tilt(void)
         tap_count = 0;
     }
         
-
     return;
 }
 
@@ -481,5 +489,8 @@ void led_seq_Cylon(void)
        enqueue(&main_ev, led_ev);
     }
     else
+    {
         i = 0; //all done
+        set_leds(green_leds);
+    }
 }

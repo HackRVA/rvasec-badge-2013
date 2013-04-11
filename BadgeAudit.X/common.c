@@ -141,7 +141,7 @@ void i2c_setup(void)
     StartI2C();
         WriteI2C(0x98);
         WriteI2C(0x0A);                //PD register
-        WriteI2C(0x3F);                // tap detection debounce
+        WriteI2C(0x3A);                // tap detection debounce
     StopI2C();
     IdleI2C();
     StartI2C();
