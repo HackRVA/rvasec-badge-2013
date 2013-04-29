@@ -33,6 +33,10 @@ enum Event get_next(struct event_buffer *in_ev);
 void enqueue(struct event_buffer *ev_buff, enum Event ev);
 void led_seq_Loading(void);
 void led_seq_Cylon(void);
+void Stage_Welcome();
+void Stage_Mimicry();
+void Stage_Fib();
+unsigned char Get_Fib_Num(unsigned char seq_num);
 
 //===========
 //Interrupt Vectors
@@ -60,6 +64,8 @@ struct event_buffer main_ev = {NULL,        //current seq ptr
                                 empty_ev,   //back
                                 empty_ev,   //middle
                                 empty_ev};  //front
+
+enum Stage current_stage = welcome;
 
 //may want buffer for led?
 enum LED_mode leds_mode = startup;
@@ -142,61 +148,351 @@ void main(void)
     //do the set led event
     enqueue(&main_ev, led_ev);
 
+    //current_stage = fib;
+    
     //main loop
     while(1)
     {
-        switch(get_next(&main_ev))
+        switch(current_stage)
         {
-            case(empty_ev):
+            case(welcome):
             {
+                Stage_Welcome();
                 break;
             }
-            case(tilt_ev):
-            {
-                check_tilt();
-                break;
-            }
-            case(shake_ev):
-            {
-                green_leds = 0;
-                set_leds(green_leds);
-                break;
-            }
-            case(tap_ev):
-            {
-                green_leds +=1;
-                set_leds(green_leds);
 
-                //enter cylon mode if they reach 255
-                if(green_leds == 10)
-                {
-                    leds_mode = cylon;
-                    enqueue(&main_ev,led_ev);
-                }
+            case(mimicry):
+            {
+                Stage_Mimicry();
                 break;
             }
-            case(button_ev):
+
+            case(fib):
             {
-                break;
-            }
-            case(led_ev):
-            {
-                if(leds_mode == startup)
-                {
-                    //ATOMIC_BEGIN
-                        led_seq_Loading();
-                    //ATOMIC_END
-                }
-                else if (leds_mode == cylon)
-                {
-                    //ATOMIC_BEGIN
-                        led_seq_Cylon();
-                    //ATOMIC_END
-                }
+                Stage_Fib();
                 break;
             }
         }
+
     }
+}
+
+void Stage_Welcome()
+{
+    switch(get_next(&main_ev))
+    {
+        case(empty_ev):
+        {
+            break;
+        }
+        case(tilt_ev):
+        {
+            check_tilt();
+            break;
+        }
+        case(shake_ev):
+        {
+            green_leds = 0;
+            set_leds(green_leds);
+            break;
+        }
+        case(tap_ev):
+        {
+            green_leds +=1;
+            set_leds(green_leds);
+
+            //enter cylon mode if they reach some num
+            if(green_leds == 10)
+            {
+                leds_mode = cylon;
+                enqueue(&main_ev,led_ev);
+            }
+            break;
+        }
+        case(button_ev):
+        {
+            break;
+        }
+        case(led_ev):
+        {
+            if(leds_mode == startup)
+            {
+                //ATOMIC_BEGIN
+                    led_seq_Loading();
+                //ATOMIC_END
+            }
+            else if (leds_mode == cylon)
+            {
+                //ATOMIC_BEGIN
+                    led_seq_Cylon();
+                //ATOMIC_END
+            }
+            break;
+        }
+    }
+}
+
+unsigned char delay_count = 0;
+unsigned char speed = 0;
+unsigned char blink_loc = 0x80;
+void Stage_Mimicry()
+{
+    if(!delay_count)
+    {
+        green_leds ^= blink_loc;
+        delay_count++;
+    }
+    else
+    {
+        Delay10KTCYx(10);
+        delay_count++;
+
+        if(delay_count > (100 - speed))
+            delay_count = 0;
+    }
+
+    set_leds(green_leds);
+
+    switch(get_next(&main_ev))
+    {
+        case(empty_ev):
+        {
+            break;
+        }
+        case(tilt_ev):
+        {
+            check_tilt();
+            break;
+        }
+        case(shake_ev):
+        {
+//            green_leds = 0;
+//            set_leds(green_leds);
+            break;
+        }
+        case(tap_ev):
+        {
+            //was the tap at the right time?
+            if((green_leds & blink_loc))
+            {
+                //did they win the round?
+                if(blink_loc == 0x01)
+                {
+                    //round complete if they made it to the top speed
+                    if(speed == 60)
+                    {
+                        current_stage = fib;
+                        set_leds(0x00);
+                    }
+                    else
+                    {
+                        speed += 20;
+                        green_leds = 0x00;
+                        blink_loc = 0x80;
+                    }
+                }
+                else
+                {
+                    blink_loc =  blink_loc >> 1;
+                    green_leds = (green_leds >> 1) | (blink_loc | 0x80);
+                }
+            }
+            else//MISSED!
+            {
+                if(blink_loc != 0x80)
+                {
+                    blink_loc = blink_loc << 1;
+                    green_leds = (green_leds << 1);
+                }
+
+            }
+            break;
+        }
+        case(button_ev):
+        {
+            break;
+        }
+        case(led_ev):
+        {
+            break;
+        }
+    }
+}
+
+unsigned char seq = 0;
+void Stage_Fib()
+{
+    //do we need to display the sequence?
+    if(seq)
+    {
+        set_leds(Get_Fib_Num(seq));
+
+        if(!delay_count)
+        {
+            seq++;
+            delay_count++;
+
+            if(seq > 14)
+                seq = 0;
+        }
+        else
+        {
+            Delay10KTCYx(100);
+            delay_count++;
+
+            if(delay_count > (10 - speed))
+                delay_count = 0;
+        }
+    }
+    set_leds(green_leds);
+
+    switch(get_next(&main_ev))
+    {
+        case(empty_ev):
+        {
+            break;
+        }
+        case(tilt_ev):
+        {
+            check_tilt();
+            break;
+        }
+        case(shake_ev):
+        {
+//            green_leds = 0;
+//            set_leds(green_leds);
+            seq = 1;
+            break;
+        }
+        case(tap_ev):
+        {
+            //was the tap at the right time?
+            if((green_leds & blink_loc))
+            {
+                //did they win the round?
+                if(blink_loc == 0x01)
+                {
+                    //round complete if they made it to the top speed
+                    if(speed == 60)
+                    {
+                        current_stage = fib;
+                        set_leds(0x00);
+                    }
+                    else
+                    {
+                        speed += 20;
+                        green_leds = 0x00;
+                        blink_loc = 0x80;
+                    }
+                }
+                else
+                {
+                    blink_loc =  blink_loc >> 1;
+                    green_leds = (green_leds >> 1) | (blink_loc | 0x80);
+                }
+            }
+            else//MISSED!
+            {
+                if(blink_loc != 0x80)
+                {
+                    blink_loc = blink_loc << 1;
+                    green_leds = (green_leds << 1);
+                }
+
+            }
+            break;
+        }
+        case(button_ev):
+        {
+            break;
+        }
+        case(led_ev):
+        {
+            break;
+        }
+    }
+
+//    switch(get_next(&main_ev))
+//    {
+//        case(empty_ev):
+//        {
+//            break;
+//        }
+//        case(tilt_ev):
+//        {
+//            check_tilt();
+//            break;
+//        }
+//        case(shake_ev):
+//        {
+//            green_leds = 0;
+//            set_leds(green_leds);
+//            break;
+//        }
+//        case(tap_ev):
+//        {
+//            green_leds +=1;
+//            set_leds(green_leds);
+//
+//            //enter cylon mode if they reach some num
+//            if(green_leds == 10)
+//            {
+//                leds_mode = cylon;
+//                enqueue(&main_ev,led_ev);
+//            }
+//            break;
+//        }
+//        case(button_ev):
+//        {
+//            break;
+//        }
+//        case(led_ev):
+//        {
+//            if(leds_mode == startup)
+//            {
+//                //ATOMIC_BEGIN
+//                    led_seq_Loading();
+//                //ATOMIC_END
+//            }
+//            else if (leds_mode == cylon)
+//            {
+//                //ATOMIC_BEGIN
+//                    led_seq_Cylon();
+//                //ATOMIC_END
+//            }
+//            break;
+//        }
+//    }
+}
+
+unsigned char Get_Fib_Num(unsigned char seq_num)
+{
+    if(seq_num == 1)
+        return 0;
+    else if(seq_num < 4)
+        return 1;
+    else if(seq_num == 4)
+        return 2;
+    else if(seq_num == 5)
+        return 3;
+    else if(seq_num == 6)
+        return 5;
+    else if(seq_num == 7)
+        return 8;
+    else if(seq_num == 8)
+        return 13;
+    else if(seq_num == 9)
+        return 21;
+    else if(seq_num == 10)
+        return 34;
+    else if(seq_num == 11)
+        return 55;
+    else if(seq_num == 12)
+        return 89;
+    else if(seq_num == 13)
+        return 144;
+    else if(seq_num == 14)
+        return 233;
 }
 
 enum Event get_next(struct event_buffer *buff_ev)
@@ -429,7 +725,10 @@ void led_seq_Loading(void)
         enqueue(&main_ev, led_ev);
     }
     else
+    {
         set_leds(0x0); //all done
+        current_stage = mimicry;
+    }
 }
  
 void led_seq_Cylon(void)

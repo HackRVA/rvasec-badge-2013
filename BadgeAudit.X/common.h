@@ -35,6 +35,9 @@ typedef enum LED_mode {startup, cylon};
 
 typedef enum Event {empty_ev, tilt_ev, shake_ev, tap_ev, button_ev, led_ev};
 
+//game stages
+typedef enum Stage {welcome, mimicry, fib, cylonsong};
+
 struct song_desc {
     volatile unsigned char note_length;
     volatile unsigned char song_index;
