@@ -3,6 +3,9 @@
  */
 #include "common.h"
 
+// -- alarm mode 
+// -- morse code
+
 #pragma config WDT = OFF                 //Watch Dog Timer off
 #pragma config FCMEN = OFF               //Disable Fail-Safe Clock Monitor
 #pragma config IESO = OFF                //Oscilator switchover off
@@ -93,14 +96,10 @@ volatile unsigned char tilt = 0;
 volatile unsigned char timer0_value;// = A_TONE;
 volatile unsigned char timer0_count = 0;
 
-volatile unsigned char excite[SONG_SIZE]
-={A_TONE_h, Ash_TONE_h, B_TONE_h, C_TONE_h, Csh_TONE_h, D_TONE_h, Dsh_TONE_h, 0,
-  B_TONE_h, C_TONE_h, Csh_TONE_h, D_TONE_h, E_TONE_h, F_TONE_h, Fsh_TONE_h, 0,
-  C_TONE_h, Csh_TONE_h, D_TONE_h, E_TONE_h, F_TONE_h, Fsh_TONE_h, G_TONE_h, 0,
-  Fsh_TONE_h, G_TONE_h, Gsh_TONE_h, Fsh_TONE_h, G_TONE_h, Gsh_TONE_h, Gsh_TONE_h, 0};
-
-struct song_desc excite_song = {35, 0, excite};
+//struct song_desc excite_song = {35, 0, excite};
 struct song_desc *playing;
+
+//add separate udata to place 
 
 //===========
 //Interrupt handler routines
@@ -140,7 +139,7 @@ void tmr0_routine(void)
 void main(void)
 {
     //set the starting song
-    playing = &excite_song;
+//    playing = &excite_song;
     
     //initialize all the things
     setup();
@@ -173,7 +172,6 @@ void main(void)
                 break;
             }
         }
-
     }
 }
 
@@ -340,11 +338,10 @@ void Stage_Fib()
             Delay10KTCYx(100);
             delay_count++;
 
-            if(delay_count > (10 - speed))
+            if(delay_count > (10))
                 delay_count = 0;
         }
     }
-    set_leds(green_leds);
 
     switch(get_next(&main_ev))
     {
@@ -359,47 +356,14 @@ void Stage_Fib()
         }
         case(shake_ev):
         {
-//            green_leds = 0;
-//            set_leds(green_leds);
             seq = 1;
             break;
         }
         case(tap_ev):
         {
             //was the tap at the right time?
-            if((green_leds & blink_loc))
-            {
-                //did they win the round?
-                if(blink_loc == 0x01)
-                {
-                    //round complete if they made it to the top speed
-                    if(speed == 60)
-                    {
-                        current_stage = fib;
-                        set_leds(0x00);
-                    }
-                    else
-                    {
-                        speed += 20;
-                        green_leds = 0x00;
-                        blink_loc = 0x80;
-                    }
-                }
-                else
-                {
-                    blink_loc =  blink_loc >> 1;
-                    green_leds = (green_leds >> 1) | (blink_loc | 0x80);
-                }
-            }
-            else//MISSED!
-            {
-                if(blink_loc != 0x80)
-                {
-                    blink_loc = blink_loc << 1;
-                    green_leds = (green_leds << 1);
-                }
-
-            }
+            green_leds++;
+            set_leds(green_leds);
             break;
         }
         case(button_ev):
@@ -617,20 +581,20 @@ void check_accel(void)
         zA = ReadI2C();
     StopI2C();
 
-    if(xA & 0b00100000)
-        printf("X: -%u\n\r", (unsigned int)(xA & 0x0F));
-    else
-        printf("X: +%u\n\r", (unsigned int)(xA & 0x0F));
-
-    if(yA & 0b00100000)
-        printf("Y: -%u\n\r", (unsigned int)(yA & 0x0F));
-    else
-        printf("Y: +%u\n\r", (unsigned int)(yA & 0x0F));
-
-    if(zA & 0b00100000)
-        printf("Z: -%u\n\n\n\r", (unsigned int)(zA & 0x0F));
-    else
-        printf("Z: +%u\n\n\n\r", (unsigned int)(zA & 0x0F));
+//    if(xA & 0b00100000)
+//        printf("X: -%u\n\r", (unsigned int)(xA & 0x0F));
+//    else
+//        printf("X: +%u\n\r", (unsigned int)(xA & 0x0F));
+//
+//    if(yA & 0b00100000)
+//        printf("Y: -%u\n\r", (unsigned int)(yA & 0x0F));
+//    else
+//        printf("Y: +%u\n\r", (unsigned int)(yA & 0x0F));
+//
+//    if(zA & 0b00100000)
+//        printf("Z: -%u\n\n\n\r", (unsigned int)(zA & 0x0F));
+//    else
+//        printf("Z: +%u\n\n\n\r", (unsigned int)(zA & 0x0F));
 
     Delay10KTCYx(400);
 }
