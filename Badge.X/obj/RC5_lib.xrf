@@ -1,0 +1,934 @@
+MPASM  5.48                       RC5_LIB.ASM   4-16-2013  21:58:38         PAGE  1
+
+                          MPASM Cross Reference File
+
+LABEL                            TYPE FILE NAME                  SOURCE FILE REFERENCES
+-----                            ---- ---------                  ----------------------
+
+A                                 C   P18F2455.INC                        46*
+ABDEN                             C   P18F2455.INC                       822*  835*
+ABDOVF                            C   P18F2455.INC                       828*  841*
+ACCESS                            C   P18F2455.INC                        47*
+ACKDT                             C   P18F2455.INC                       908*
+ACKEN                             C   P18F2455.INC                       907*
+ACKSTAT                           C   P18F2455.INC                       909*
+ACQT0                             C   P18F2455.INC                       871*
+ACQT1                             C   P18F2455.INC                       872*
+ACQT2                             C   P18F2455.INC                       873*
+ACTVIE                            C   P18F2455.INC                       246*
+ACTVIF                            C   P18F2455.INC                       236*
+ADCON0                            C   P18F2455.INC                       146*
+ADCON1                            C   P18F2455.INC                       145*
+ADCON2                            C   P18F2455.INC                       144*
+ADCS0                             C   P18F2455.INC                       868*
+ADCS1                             C   P18F2455.INC                       869*
+ADCS2                             C   P18F2455.INC                       870*
+ADDEN                             C   P18F2455.INC                       733*
+ADDR0                             C   P18F2455.INC                       291*
+ADDR1                             C   P18F2455.INC                       292*
+ADDR2                             C   P18F2455.INC                       293*
+ADDR3                             C   P18F2455.INC                       294*
+ADDR4                             C   P18F2455.INC                       295*
+ADDR5                             C   P18F2455.INC                       296*
+ADDR6                             C   P18F2455.INC                       297*
+ADEN                              C   P18F2455.INC                       739*
+ADFM                              C   P18F2455.INC                       866*
+ADIE                              C   P18F2455.INC                       657*
+ADIF                              C   P18F2455.INC                       667*
+ADIP                              C   P18F2455.INC                       677*
+ADON                              C   P18F2455.INC                       886*
+ADRES                             C   P18F2455.INC                       147*
+ADRESH                            C   P18F2455.INC                       149*
+ADRESL                            C   P18F2455.INC                       148*
+AN0                               C   P18F2455.INC                       448*
+AN1                               C   P18F2455.INC                       449*
+AN2                               C   P18F2455.INC                       450*
+AN3                               C   P18F2455.INC                       451*
+AN4                               C   P18F2455.INC                       453*
+AddrByte                          A   RC5_LIB.ASM                         56*   61*  129.  130.  131.  151.  157.  163.  169.  175.
+BANKED                            C   P18F2455.INC                        48*
+BAUDCON                           C   P18F2455.INC                       134*
+BAUDCTL                           C   P18F2455.INC                       135*
+BCLIE                             C   P18F2455.INC                       684*
+BCLIF                             C   P18F2455.INC                       697*
+BCLIP                             C   P18F2455.INC                       710*
+BF                                C   P18F2455.INC                       926*
+BGST                              C   P18F2455.INC                      1029* 1053*
+BOR                               C   P18F2455.INC                       994*
+BRG16                             C   P18F2455.INC                       824*  837*
+BRGH                              C   P18F2455.INC                       745*
+MPASM  5.48                       RC5_LIB.ASM   4-16-2013  21:58:38         PAGE  2
+
+                          MPASM Cross Reference File
+
+LABEL                            TYPE FILE NAME                  SOURCE FILE REFERENCES
+-----                            ---- ---------                  ----------------------
+
+BSR                               C   P18F2455.INC                       179*
+BTOEE                             C   P18F2455.INC                       267*
+BTOEF                             C   P18F2455.INC                       258*
+BTSEE                             C   P18F2455.INC                       268*
+BTSEF                             C   P18F2455.INC                       259*
+C                                 C   RC5_LIB.ASM                        152.  154.  158.  160.  164.  166.  170.  172.  176.  178.
+                                                                         186.  188.  192.  194.  198.  200.  204.  206.  210.  212.
+                                                                         216.  218.
+                                      P18F2455.INC                      1082*
+C1INV                             C   P18F2455.INC                       770*
+C1OUT                             C   P18F2455.INC                       772*
+C2INV                             C   P18F2455.INC                       771*
+C2OUT                             C   P18F2455.INC                       773*
+CCP1                              C   P18F2455.INC                       492*
+CCP1AS                            C   P18F2455.INC                       130*
+CCP1CON                           C   P18F2455.INC                       140*
+CCP1DEL                           C   P18F2455.INC                       132*
+CCP1IE                            C   P18F2455.INC                       653*
+CCP1IF                            C   P18F2455.INC                       663*
+CCP1IP                            C   P18F2455.INC                       673*
+CCP1M0                            C   P18F2455.INC                       857*
+CCP1M1                            C   P18F2455.INC                       858*
+CCP1M2                            C   P18F2455.INC                       859*
+CCP1M3                            C   P18F2455.INC                       860*
+CCP2CON                           C   P18F2455.INC                       136*
+CCP2IE                            C   P18F2455.INC                       681*
+CCP2IF                            C   P18F2455.INC                       694*
+CCP2IP                            C   P18F2455.INC                       707*
+CCP2M0                            C   P18F2455.INC                       848*
+CCP2M1                            C   P18F2455.INC                       849*
+CCP2M2                            C   P18F2455.INC                       850*
+CCP2M3                            C   P18F2455.INC                       851*
+CCPR1                             C   P18F2455.INC                       141*
+CCPR1H                            C   P18F2455.INC                       143*
+CCPR1L                            C   P18F2455.INC                       142*
+CCPR2                             C   P18F2455.INC                       137*
+CCPR2H                            C   P18F2455.INC                       139*
+CCPR2L                            C   P18F2455.INC                       138*
+CD_PLAYER                         M   RC5_LIB.ASM                         42*
+CFGS                              C   P18F2455.INC                       725*
+CHS0                              C   P18F2455.INC                       890*
+CHS1                              C   P18F2455.INC                       891*
+CHS2                              C   P18F2455.INC                       892*
+CHS3                              C   P18F2455.INC                       893*
+CIS                               C   P18F2455.INC                       769*
+CK                                C   P18F2455.INC                       498*
+CKE                               C   P18F2455.INC                       932*
+CKP                               C   P18F2455.INC                       914*
+CM0                               C   P18F2455.INC                       775*
+CM1                               C   P18F2455.INC                       776*
+CM2                               C   P18F2455.INC                       777*
+CMCON                             C   P18F2455.INC                       128*
+MPASM  5.48                       RC5_LIB.ASM   4-16-2013  21:58:38         PAGE  3
+
+                          MPASM Cross Reference File
+
+LABEL                            TYPE FILE NAME                  SOURCE FILE REFERENCES
+-----                            ---- ---------                  ----------------------
+
+CMIE                              C   P18F2455.INC                       687*
+CMIF                              C   P18F2455.INC                       700*
+CMIP                              C   P18F2455.INC                       713*
+CRC16EE                           C   P18F2455.INC                       265*
+CRC16EF                           C   P18F2455.INC                       256*
+CRC5EE                            C   P18F2455.INC                       264*
+CRC5EF                            C   P18F2455.INC                       255*
+CREN                              C   P18F2455.INC                       734*
+CSRC                              C   P18F2455.INC                       750*
+CVR0                              C   P18F2455.INC                       786*
+CVR1                              C   P18F2455.INC                       787*
+CVR2                              C   P18F2455.INC                       788*
+CVR3                              C   P18F2455.INC                       789*
+CVRCON                            C   P18F2455.INC                       129*
+CVREF                             C   P18F2455.INC                       790*
+CVREN                             C   P18F2455.INC                       784*
+CVROE                             C   P18F2455.INC                       783*
+CVRR                              C   P18F2455.INC                       782*
+CVRSS                             C   P18F2455.INC                       781*
+CarrierLoopOne                    A   RC5_LIB.ASM                        299*  318.
+CarrierLoopZero                   A   RC5_LIB.ASM                        343*  361.
+D                                 C   P18F2455.INC                       953*
+D1                                A   RC5_LIB.ASM                        407*  408.
+D2                                A   RC5_LIB.ASM                        415*  416.
+D3                                A   RC5_LIB.ASM                        433*  434.
+DATA_ADDRESS                      C   P18F2455.INC                       950*
+DC                                C   P18F2455.INC                      1083*
+DC1B0                             C   P18F2455.INC                       861*
+DC1B1                             C   P18F2455.INC                       862*
+DC2B0                             C   P18F2455.INC                       852*
+DC2B1                             C   P18F2455.INC                       853*
+DD0                               A   RC5_LIB.ASM                        269*  270.
+DD1                               A   RC5_LIB.ASM                        278*  279.
+DD2                               A   RC5_LIB.ASM                        286.  296*
+DD3                               A   RC5_LIB.ASM                        310*  311.
+DDRA                              M   P18F2455.INC                        54*  101.
+DDRB                              M   P18F2455.INC                        55*  103.
+DDRC                              M   P18F2455.INC                        56*  105.
+DDRD                              M   P18F2455.INC                        57*
+DDRE                              M   P18F2455.INC                        58*
+DFN8EE                            C   P18F2455.INC                       266*
+DFN8EF                            C   P18F2455.INC                       257*
+DIR                               C   P18F2455.INC                       273*
+DL3                               A   RC5_LIB.ASM                        304.  305*
+DL4                               A   RC5_LIB.ASM                        305.  306*
+DL5                               A   RC5_LIB.ASM                        306.  307*
+DONE                              C   P18F2455.INC                       895*
+DZ1                               A   RC5_LIB.ASM                        348.  349*
+DZ2                               A   RC5_LIB.ASM                        349.  350*
+DZ3                               A   RC5_LIB.ASM                        350.  351*
+DZ4                               A   RC5_LIB.ASM                        354*  355.
+DZ5                               A   RC5_LIB.ASM                        367.  370*
+MPASM  5.48                       RC5_LIB.ASM   4-16-2013  21:58:38         PAGE  4
+
+                          MPASM Cross Reference File
+
+LABEL                            TYPE FILE NAME                  SOURCE FILE REFERENCES
+-----                            ---- ---------                  ----------------------
+
+DZ6                               A   RC5_LIB.ASM                        375*  376.
+DZ7                               A   RC5_LIB.ASM                        384*  386.
+D_A                               C   P18F2455.INC                       936*
+D_NOT_A                           C   P18F2455.INC                       931*
+DataByte                          A   RC5_LIB.ASM                         55*   60*  133.  134.  185.  191.  197.  203.  209.  215.
+DebounceDelay                     A   RC5_LIB.ASM                        430*
+Delay_Count                       A   RC5_LIB.ASM                         52*  268.  269.  277.  278.  309.  310.  353.  354.  374.
+                                                                         375.  383.  384.  406.  407.  414.  415.  432.  433.
+Delay_Count2                      A   RC5_LIB.ASM                         53*  297.  316.  341.  360.
+ECCP1AS                           C   P18F2455.INC                       131*
+ECCP1DEL                          C   P18F2455.INC                       133*
+ECCPAS0                           C   P18F2455.INC                       798*  808*
+ECCPAS1                           C   P18F2455.INC                       799*  809*
+ECCPAS2                           C   P18F2455.INC                       800*  810*
+ECCPASE                           C   P18F2455.INC                       794*  804*
+EEADR                             C   P18F2455.INC                       117*
+EECON1                            C   P18F2455.INC                       114*
+EECON2                            C   P18F2455.INC                       115*
+EEDATA                            C   P18F2455.INC                       116*
+EEIE                              C   P18F2455.INC                       685*
+EEIF                              C   P18F2455.INC                       698*
+EEIP                              C   P18F2455.INC                       711*
+EEPGD                             C   P18F2455.INC                       726*
+ENDP0                             C   P18F2455.INC                       275*
+ENDP1                             C   P18F2455.INC                       276*
+ENDP2                             C   P18F2455.INC                       277*
+ENDP3                             C   P18F2455.INC                       278*
+EPCONDIS                          C   P18F2455.INC                       315*  323*  331*  339*  347*  355*  363*  371*  379*  387*
+                                                                         395*  403*  411*  419*  427*  435*
+EPHSHK                            C   P18F2455.INC                       316*  324*  332*  340*  348*  356*  364*  372*  380*  388*
+                                                                         396*  404*  412*  420*  428*  436*
+EPINEN                            C   P18F2455.INC                       313*  321*  329*  337*  345*  353*  361*  369*  377*  385*
+                                                                         393*  401*  409*  417*  425*  433*
+EPOUTEN                           C   P18F2455.INC                       314*  322*  330*  338*  346*  354*  362*  370*  378*  386*
+                                                                         394*  402*  410*  418*  426*  434*
+EPSTALL                           C   P18F2455.INC                       312*  320*  328*  336*  344*  352*  360*  368*  376*  384*
+                                                                         392*  400*  408*  416*  424*  432*
+FAST                              C   P18F2455.INC                        43*
+FERR                              C   P18F2455.INC                       732*
+FLTS                              C   P18F2455.INC                      1063*
+FREE                              C   P18F2455.INC                       724*
+FRM0                              C   P18F2455.INC                       217*
+FRM1                              C   P18F2455.INC                       218*
+FRM10                             C   P18F2455.INC                       230*
+FRM2                              C   P18F2455.INC                       219*
+FRM3                              C   P18F2455.INC                       220*
+FRM4                              C   P18F2455.INC                       221*
+FRM5                              C   P18F2455.INC                       222*
+FRM6                              C   P18F2455.INC                       223*
+FRM7                              C   P18F2455.INC                       224*
+FRM8                              C   P18F2455.INC                       228*
+FRM9                              C   P18F2455.INC                       229*
+MPASM  5.48                       RC5_LIB.ASM   4-16-2013  21:58:38         PAGE  5
+
+                          MPASM Cross Reference File
+
+LABEL                            TYPE FILE NAME                  SOURCE FILE REFERENCES
+-----                            ---- ---------                  ----------------------
+
+FSEN                              C   P18F2455.INC                       301*
+FSR0                              C   P18F2455.INC                        39*
+FSR0H                             C   P18F2455.INC                       189*
+FSR0L                             C   P18F2455.INC                       188*
+FSR1                              C   P18F2455.INC                        40*
+FSR1H                             C   P18F2455.INC                       181*
+FSR1L                             C   P18F2455.INC                       180*
+FSR2                              C   P18F2455.INC                        41*
+FSR2H                             C   P18F2455.INC                       173*
+FSR2L                             C   P18F2455.INC                       172*
+GCEN                              C   P18F2455.INC                       910*
+GIE                               C   P18F2455.INC                      1132*
+GIEH                              C   RC5_LIB.ASM                        126.  246.
+                                      P18F2455.INC                      1135*
+GIEL                              C   P18F2455.INC                      1134*
+GIE_GIEH                          C   P18F2455.INC                      1125*
+GO                                C   P18F2455.INC                       897*
+GO_DONE                           C   P18F2455.INC                       889*
+GO_NOT_DONE                       C   P18F2455.INC                       887*
+HLVDCON                           C   P18F2455.INC                       164*
+HLVDEN                            C   P18F2455.INC                      1009* 1033*
+HLVDIE                            C   P18F2455.INC                       683*
+HLVDIF                            C   P18F2455.INC                       696*
+HLVDIN                            C   P18F2455.INC                       460*
+HLVDIP                            C   P18F2455.INC                       709*
+HLVDL0                            C   P18F2455.INC                      1013* 1037*
+HLVDL1                            C   P18F2455.INC                      1014* 1038*
+HLVDL2                            C   P18F2455.INC                      1015* 1039*
+HLVDL3                            C   P18F2455.INC                      1016* 1040*
+I2C_DAT                           C   P18F2455.INC                       941*
+I2C_READ                          C   P18F2455.INC                       938*
+I2C_START                         C   P18F2455.INC                       939*
+I2C_STOP                          C   P18F2455.INC                       940*
+IDLEIE                            C   P18F2455.INC                       248*
+IDLEIF                            C   P18F2455.INC                       238*
+IDLEN                             C   P18F2455.INC                      1059*
+INDF0                             C   P18F2455.INC                       194*
+INDF1                             C   P18F2455.INC                       186*
+INDF2                             C   P18F2455.INC                       178*
+INT0                              C   P18F2455.INC                       473*
+INT0E                             C   P18F2455.INC                      1129*
+INT0F                             C   P18F2455.INC                      1127*
+INT0IE                            C   P18F2455.INC                      1122*
+INT0IF                            C   P18F2455.INC                      1119*
+INT1                              C   P18F2455.INC                       474*
+INT1E                             C   P18F2455.INC                      1099*
+INT1F                             C   P18F2455.INC                      1097*
+INT1IE                            C   P18F2455.INC                      1092*
+INT1IF                            C   P18F2455.INC                      1090*
+INT1IP                            C   P18F2455.INC                      1094*
+INT1P                             C   P18F2455.INC                      1101*
+INT2                              C   P18F2455.INC                       475*
+MPASM  5.48                       RC5_LIB.ASM   4-16-2013  21:58:38         PAGE  6
+
+                          MPASM Cross Reference File
+
+LABEL                            TYPE FILE NAME                  SOURCE FILE REFERENCES
+-----                            ---- ---------                  ----------------------
+
+INT2E                             C   P18F2455.INC                      1100*
+INT2F                             C   P18F2455.INC                      1098*
+INT2IE                            C   P18F2455.INC                      1093*
+INT2IF                            C   P18F2455.INC                      1091*
+INT2IP                            C   P18F2455.INC                      1095*
+INT2P                             C   P18F2455.INC                      1102*
+INTCON                            C   RC5_LIB.ASM                        126.  246.
+                                      P18F2455.INC                       197*
+INTCON2                           C   P18F2455.INC                       196*
+INTCON3                           C   P18F2455.INC                       195*
+INTEDG0                           C   P18F2455.INC                      1110*
+INTEDG1                           C   P18F2455.INC                      1109*
+INTEDG2                           C   P18F2455.INC                      1108*
+INTSRC                            C   P18F2455.INC                       641*
+IOFS                              C   P18F2455.INC                      1057*
+IPEN                              C   P18F2455.INC                       992*
+IPR1                              C   P18F2455.INC                       110*
+IPR2                              C   P18F2455.INC                       113*
+IRCF0                             C   P18F2455.INC                      1064*
+IRCF1                             C   P18F2455.INC                      1065*
+IRCF2                             C   P18F2455.INC                      1066*
+IRVST                             C   P18F2455.INC                      1010* 1034*
+IVRST                             C   P18F2455.INC                      1023* 1047*
+LATA                              C   P18F2455.INC                        98*
+LATA0                             C   P18F2455.INC                       508*
+LATA1                             C   P18F2455.INC                       509*
+LATA2                             C   P18F2455.INC                       510*
+LATA3                             C   P18F2455.INC                       511*
+LATA4                             C   P18F2455.INC                       512*
+LATA5                             C   P18F2455.INC                       513*
+LATA6                             C   P18F2455.INC                       514*
+LATB                              C   P18F2455.INC                        99*
+LATB0                             C   P18F2455.INC                       518*
+LATB1                             C   P18F2455.INC                       519*
+LATB2                             C   P18F2455.INC                       520*
+LATB3                             C   P18F2455.INC                       521*
+LATB4                             C   P18F2455.INC                       522*
+LATB5                             C   P18F2455.INC                       523*
+LATB6                             C   P18F2455.INC                       524*
+LATB7                             C   P18F2455.INC                       525*
+LATC                              C   P18F2455.INC                       100*
+LATC0                             C   P18F2455.INC                       529*
+LATC1                             C   P18F2455.INC                       530*
+LATC2                             C   P18F2455.INC                       531*
+LATC6                             C   P18F2455.INC                       532*
+LATC7                             C   P18F2455.INC                       533*
+LVDCON                            C   P18F2455.INC                       165*
+LVDEN                             C   P18F2455.INC                      1022* 1046*
+LVDIE                             C   P18F2455.INC                       690*
+LVDIF                             C   P18F2455.INC                       703*
+LVDIN                             C   P18F2455.INC                       458*
+LVDIP                             C   P18F2455.INC                       716*
+MPASM  5.48                       RC5_LIB.ASM   4-16-2013  21:58:38         PAGE  7
+
+                          MPASM Cross Reference File
+
+LABEL                            TYPE FILE NAME                  SOURCE FILE REFERENCES
+-----                            ---- ---------                  ----------------------
+
+LVDL0                             C   P18F2455.INC                      1018* 1042*
+LVDL1                             C   P18F2455.INC                      1019* 1043*
+LVDL2                             C   P18F2455.INC                      1020* 1044*
+LVDL3                             C   P18F2455.INC                      1021* 1045*
+LVV0                              C   P18F2455.INC                      1025* 1049*
+LVV1                              C   P18F2455.INC                      1026* 1050*
+LVV2                              C   P18F2455.INC                      1027* 1051*
+LVV3                              C   P18F2455.INC                      1028* 1052*
+N                                 C   P18F2455.INC                      1086*
+NOT_A                             C   P18F2455.INC                       944*
+NOT_ADDRESS                       C   P18F2455.INC                       947*
+NOT_BOR                           C   P18F2455.INC                       986*
+NOT_DONE                          C   P18F2455.INC                       899*
+NOT_IPEN                          C   P18F2455.INC                       999*
+NOT_PD                            C   P18F2455.INC                       988*
+NOT_POR                           C   P18F2455.INC                       987*
+NOT_RBPU                          C   P18F2455.INC                      1111*
+NOT_RI                            C   P18F2455.INC                       990*
+NOT_T1SYNC                        C   P18F2455.INC                       975*
+NOT_T3SYNC                        C   P18F2455.INC                       756*
+NOT_TO                            C   P18F2455.INC                       989*
+NOT_W                             C   P18F2455.INC                       943*
+NOT_WRITE                         C   P18F2455.INC                       946*
+OERR                              C   P18F2455.INC                       731*
+OSC2                              C   P18F2455.INC                       454*
+OSCCON                            C   P18F2455.INC                       166*
+OSCFIE                            C   P18F2455.INC                       688*
+OSCFIF                            C   P18F2455.INC                       701*
+OSCFIP                            C   P18F2455.INC                       714*
+OSCTUNE                           C   P18F2455.INC                       107*
+OSTS                              C   P18F2455.INC                      1058*
+OUTPUT_LED                        M   RC5_LIB.ASM                         37*  227.  264.  300.  307.  344.  351.  370.
+OV                                C   P18F2455.INC                      1085*
+P                                 C   P18F2455.INC                       930*
+P1A                               C   P18F2455.INC                       497*
+PC                                C   P18F2455.INC                       206*
+PCFG0                             C   P18F2455.INC                       877*
+PCFG1                             C   P18F2455.INC                       878*
+PCFG2                             C   P18F2455.INC                       879*
+PCFG3                             C   P18F2455.INC                       880*
+PCL                               C   P18F2455.INC                       207*
+PCLATH                            C   P18F2455.INC                       208*
+PCLATU                            C   P18F2455.INC                       209*
+PD                                C   P18F2455.INC                       996*
+PEIE                              C   P18F2455.INC                      1131*
+PEIE_GIEL                         C   P18F2455.INC                      1124*
+PEN                               C   P18F2455.INC                       905*
+PGC                               C   P18F2455.INC                       477*
+PGD                               C   P18F2455.INC                       478*
+PGM                               C   P18F2455.INC                       476*
+PIDEE                             C   P18F2455.INC                       263*
+PIDEF                             C   P18F2455.INC                       254*
+MPASM  5.48                       RC5_LIB.ASM   4-16-2013  21:58:38         PAGE  8
+
+                          MPASM Cross Reference File
+
+LABEL                            TYPE FILE NAME                  SOURCE FILE REFERENCES
+-----                            ---- ---------                  ----------------------
+
+PIE1                              C   P18F2455.INC                       108*
+PIE2                              C   P18F2455.INC                       111*
+PIR1                              C   P18F2455.INC                       109*
+PIR2                              C   P18F2455.INC                       112*
+PKTDIS                            C   P18F2455.INC                       285*
+PLAY_CMD                          M   RC5_LIB.ASM                         44*
+PLUSW0                            C   P18F2455.INC                       190*
+PLUSW1                            C   P18F2455.INC                       182*
+PLUSW2                            C   P18F2455.INC                       174*
+POR                               C   P18F2455.INC                       995*
+PORTA                             C   P18F2455.INC                        94*
+PORTB                             C   RC5_LIB.ASM                        227.  264.  300.  307.  344.  351.  370.
+                                      P18F2455.INC                        95*
+PORTC                             C   P18F2455.INC                        96*
+PORTE                             C   P18F2455.INC                        97*
+POSTDEC0                          C   P18F2455.INC                       192*
+POSTDEC1                          C   P18F2455.INC                       184*
+POSTDEC2                          C   P18F2455.INC                       176*
+POSTINC0                          C   P18F2455.INC                       193*
+POSTINC1                          C   P18F2455.INC                       185*
+POSTINC2                          C   P18F2455.INC                       177*
+PPB0                              C   P18F2455.INC                       307*
+PPB1                              C   P18F2455.INC                       308*
+PPBI                              C   P18F2455.INC                       272*
+PPBRST                            C   P18F2455.INC                       287*
+PR2                               C   P18F2455.INC                       156*
+PREINC0                           C   P18F2455.INC                       191*
+PREINC1                           C   P18F2455.INC                       183*
+PREINC2                           C   P18F2455.INC                       175*
+PROD                              C   P18F2455.INC                       198*
+PRODH                             C   P18F2455.INC                       200*
+PRODL                             C   P18F2455.INC                       199*
+PRSEN                             C   P18F2455.INC                       814*  818*
+PSA                               C   P18F2455.INC                      1070*
+PSSAC0                            C   P18F2455.INC                       796*  806*
+PSSAC1                            C   P18F2455.INC                       797*  807*
+R                                 C   P18F2455.INC                       952*
+RA0                               C   P18F2455.INC                       440*  545*  563*
+RA1                               C   P18F2455.INC                       441*  546*  564*
+RA2                               C   P18F2455.INC                       442*  547*  565*
+RA3                               C   P18F2455.INC                       443*  548*  566*
+RA4                               C   P18F2455.INC                       444*  549*  567*
+RA5                               C   P18F2455.INC                       445*  550*  568*
+RA6                               C   P18F2455.INC                       446*  551*  569*
+RB0                               C   P18F2455.INC                       464*  582*  602*
+RB1                               C   P18F2455.INC                       465*  583*  603*
+RB2                               C   P18F2455.INC                       466*  584*  604*
+RB3                               C   P18F2455.INC                       467*  585*  605*
+RB4                               C   P18F2455.INC                       468*  586*  606*
+RB5                               C   RC5_LIB.ASM                        227.  264.  300.  307.  344.  351.  370.
+                                      P18F2455.INC                       469*  587*  607*
+RB6                               C   P18F2455.INC                       470*  588*  608*
+MPASM  5.48                       RC5_LIB.ASM   4-16-2013  21:58:38         PAGE  9
+
+                          MPASM Cross Reference File
+
+LABEL                            TYPE FILE NAME                  SOURCE FILE REFERENCES
+-----                            ---- ---------                  ----------------------
+
+RB7                               C   P18F2455.INC                       471*  589*  609*
+RBIE                              C   P18F2455.INC                      1121*
+RBIF                              C   P18F2455.INC                      1118*
+RBIP                              C   P18F2455.INC                      1106*
+RBPU                              C   P18F2455.INC                      1114*
+RC0                               C   P18F2455.INC                       482*  619*  633*
+RC1                               C   P18F2455.INC                       483*  620*  634*
+RC2                               C   P18F2455.INC                       484*  621*  635*
+RC4                               C   P18F2455.INC                       485*
+RC5                               C   P18F2455.INC                       486*
+RC6                               C   P18F2455.INC                       487*  622*  636*
+RC7                               C   P18F2455.INC                       488*  623*  637*
+RCEN                              C   P18F2455.INC                       906*
+RCIDL                             C   P18F2455.INC                       827*  840*
+RCIE                              C   P18F2455.INC                       656*
+RCIF                              C   P18F2455.INC                       666*
+RCIP                              C   P18F2455.INC                       676*
+RCMT                              C   P18F2455.INC                       831*  844*
+RCON                              C   P18F2455.INC                       162*
+RCREG                             C   P18F2455.INC                       121*
+RCSTA                             C   P18F2455.INC                       118*
+RD                                C   P18F2455.INC                       720*
+RD16                              C   P18F2455.INC                       759*  978*
+RE3                               C   P18F2455.INC                       504*
+READ_WRITE                        C   P18F2455.INC                       949*
+RESUME                            C   P18F2455.INC                       283*
+RI                                C   P18F2455.INC                       998*
+RSEN                              C   P18F2455.INC                       904*
+RX                                C   P18F2455.INC                       494*
+RX9                               C   P18F2455.INC                       736*
+RX9D                              C   P18F2455.INC                       730*
+RXDTP                             C   P18F2455.INC                       826*  839*
+R_NOT_W                           C   P18F2455.INC                       928*
+R_W                               C   P18F2455.INC                       935*
+S                                 C   P18F2455.INC                       929*
+SBOREN                            C   P18F2455.INC                       991*
+SCKP                              C   P18F2455.INC                       830*  843*
+SCS0                              C   P18F2455.INC                      1061*
+SCS1                              C   P18F2455.INC                      1062*
+SE0                               C   P18F2455.INC                       286*
+SEN                               C   P18F2455.INC                       903*
+SENDB                             C   P18F2455.INC                       746*
+SMP                               C   P18F2455.INC                       933*
+SOFIE                             C   P18F2455.INC                       250*
+SOFIF                             C   P18F2455.INC                       240*
+SPBRG                             C   P18F2455.INC                       122*
+SPBRGH                            C   P18F2455.INC                       123*
+SPEN                              C   P18F2455.INC                       737*
+SREN                              C   P18F2455.INC                       735*
+SSPADD                            C   P18F2455.INC                       153*
+SSPBUF                            C   P18F2455.INC                       154*
+SSPCON1                           C   P18F2455.INC                       151*
+MPASM  5.48                       RC5_LIB.ASM   4-16-2013  21:58:38         PAGE 10
+
+                          MPASM Cross Reference File
+
+LABEL                            TYPE FILE NAME                  SOURCE FILE REFERENCES
+-----                            ---- ---------                  ----------------------
+
+SSPCON2                           C   P18F2455.INC                       150*
+SSPEN                             C   P18F2455.INC                       915*
+SSPIE                             C   P18F2455.INC                       654*
+SSPIF                             C   P18F2455.INC                       664*
+SSPIP                             C   P18F2455.INC                       674*
+SSPM0                             C   P18F2455.INC                       919*
+SSPM1                             C   P18F2455.INC                       920*
+SSPM2                             C   P18F2455.INC                       921*
+SSPM3                             C   P18F2455.INC                       922*
+SSPOV                             C   P18F2455.INC                       916*
+SSPSTAT                           C   P18F2455.INC                       152*
+STALLIE                           C   P18F2455.INC                       249*
+STALLIF                           C   P18F2455.INC                       239*
+STATUS                            C   RC5_LIB.ASM                        152.  154.  158.  160.  164.  166.  170.  172.  176.  178.
+                                                                         186.  188.  192.  194.  198.  200.  204.  206.  210.  212.
+                                                                         216.  218.
+                                      P18F2455.INC                       171*
+STKFUL                            C   P18F2455.INC                      1140*
+STKOVF                            C   P18F2455.INC                      1148*
+STKPTR                            C   P18F2455.INC                       210*
+STKPTR0                           C   P18F2455.INC                      1142*
+STKPTR1                           C   P18F2455.INC                      1143*
+STKPTR2                           C   P18F2455.INC                      1144*
+STKPTR3                           C   P18F2455.INC                      1145*
+STKPTR4                           C   P18F2455.INC                      1146*
+STKUNF                            C   P18F2455.INC                      1139*
+STOP_CMD                          M   RC5_LIB.ASM                         45*
+SUSPND                            C   P18F2455.INC                       282*
+SWDTE                             C   P18F2455.INC                      1005*
+SWDTEN                            C   P18F2455.INC                      1003*
+SYNC                              C   P18F2455.INC                       747*
+SendOne                           A   RC5_LIB.ASM                        137.  138.  144.  155.  161.  167.  173.  179.  189.  195.
+                                                                         201.  207.  213.  219.  261*
+SendRC5                           A   RC5_LIB.ASM                         65*  125*
+SendZero                          A   RC5_LIB.ASM                        142.  153.  159.  165.  171.  177.  187.  193.  199.  205.
+                                                                         211.  217.  332*
+T08BIT                            C   P18F2455.INC                      1073*
+T0CKI                             C   P18F2455.INC                       452*
+T0CON                             C   P18F2455.INC                       167*
+T0CS                              C   P18F2455.INC                      1072*
+T0IE                              C   P18F2455.INC                      1130*
+T0IF                              C   P18F2455.INC                      1128*
+T0IP                              C   P18F2455.INC                      1113*
+T0PS0                             C   P18F2455.INC                      1076*
+T0PS1                             C   P18F2455.INC                      1077*
+T0PS2                             C   P18F2455.INC                      1078*
+T0SE                              C   P18F2455.INC                      1071*
+T13CKI                            C   P18F2455.INC                       496*
+T1CKPS0                           C   P18F2455.INC                       981*
+T1CKPS1                           C   P18F2455.INC                       982*
+T1CON                             C   P18F2455.INC                       158*
+T1OSCEN                           C   P18F2455.INC                       976*
+MPASM  5.48                       RC5_LIB.ASM   4-16-2013  21:58:38         PAGE 11
+
+                          MPASM Cross Reference File
+
+LABEL                            TYPE FILE NAME                  SOURCE FILE REFERENCES
+-----                            ---- ---------                  ----------------------
+
+T1OSI                             C   P18F2455.INC                       491*
+T1OSO                             C   P18F2455.INC                       490*
+T1RUN                             C   P18F2455.INC                       977*
+T1SYNC                            C   P18F2455.INC                       980*
+T2CKPS0                           C   P18F2455.INC                       959*
+T2CKPS1                           C   P18F2455.INC                       960*
+T2CON                             C   P18F2455.INC                       155*
+T2OUTPS0                          C   P18F2455.INC                       961*
+T2OUTPS1                          C   P18F2455.INC                       962*
+T2OUTPS2                          C   P18F2455.INC                       963*
+T2OUTPS3                          C   P18F2455.INC                       964*
+T3CCP1                            C   P18F2455.INC                       757*
+T3CCP2                            C   P18F2455.INC                       758*
+T3CKPS0                           C   P18F2455.INC                       762*
+T3CKPS1                           C   P18F2455.INC                       763*
+T3CON                             C   P18F2455.INC                       124*
+T3NSYNC                           C   P18F2455.INC                       765*
+T3SYNC                            C   P18F2455.INC                       761*
+TABLAT                            C   P18F2455.INC                       201*
+TBLPTR                            C   P18F2455.INC                       202*
+TBLPTRH                           C   P18F2455.INC                       204*
+TBLPTRL                           C   P18F2455.INC                       203*
+TBLPTRU                           C   P18F2455.INC                       205*
+TMR0                              C   P18F2455.INC                       168*
+TMR0H                             C   P18F2455.INC                       170*
+TMR0IE                            C   P18F2455.INC                      1123*
+TMR0IF                            C   P18F2455.INC                      1120*
+TMR0IP                            C   P18F2455.INC                      1107*
+TMR0L                             C   P18F2455.INC                       169*
+TMR0ON                            C   P18F2455.INC                      1074*
+TMR1                              C   P18F2455.INC                       159*
+TMR1CS                            C   P18F2455.INC                       974*
+TMR1H                             C   P18F2455.INC                       161*
+TMR1IE                            C   P18F2455.INC                       651*
+TMR1IF                            C   P18F2455.INC                       661*
+TMR1IP                            C   P18F2455.INC                       671*
+TMR1L                             C   P18F2455.INC                       160*
+TMR1ON                            C   P18F2455.INC                       973*
+TMR2                              C   P18F2455.INC                       157*
+TMR2IE                            C   P18F2455.INC                       652*
+TMR2IF                            C   P18F2455.INC                       662*
+TMR2IP                            C   P18F2455.INC                       672*
+TMR2ON                            C   P18F2455.INC                       957*
+TMR3                              C   P18F2455.INC                       125*
+TMR3CS                            C   P18F2455.INC                       755*
+TMR3H                             C   P18F2455.INC                       127*
+TMR3IE                            C   P18F2455.INC                       682*
+TMR3IF                            C   P18F2455.INC                       695*
+TMR3IP                            C   P18F2455.INC                       708*
+TMR3L                             C   P18F2455.INC                       126*
+TMR3ON                            C   P18F2455.INC                       754*
+TO                                C   P18F2455.INC                       997*
+MPASM  5.48                       RC5_LIB.ASM   4-16-2013  21:58:38         PAGE 12
+
+                          MPASM Cross Reference File
+
+LABEL                            TYPE FILE NAME                  SOURCE FILE REFERENCES
+-----                            ---- ---------                  ----------------------
+
+TOS                               C   P18F2455.INC                       211*
+TOSH                              C   P18F2455.INC                       213*
+TOSL                              C   P18F2455.INC                       212*
+TOSU                              C   P18F2455.INC                       214*
+TOUTPS0                           C   P18F2455.INC                       966*
+TOUTPS1                           C   P18F2455.INC                       967*
+TOUTPS2                           C   P18F2455.INC                       968*
+TOUTPS3                           C   P18F2455.INC                       969*
+TRISA                             C   P18F2455.INC                       101*  102*
+TRISA0                            C   P18F2455.INC                       537*  555*
+TRISA1                            C   P18F2455.INC                       538*  556*
+TRISA2                            C   P18F2455.INC                       539*  557*
+TRISA3                            C   P18F2455.INC                       540*  558*
+TRISA4                            C   P18F2455.INC                       541*  559*
+TRISA5                            C   P18F2455.INC                       542*  560*
+TRISA6                            C   P18F2455.INC                       543*  561*
+TRISB                             C   P18F2455.INC                       103*  104*
+TRISB0                            C   P18F2455.INC                       573*  593*
+TRISB1                            C   P18F2455.INC                       574*  594*
+TRISB2                            C   P18F2455.INC                       575*  595*
+TRISB3                            C   P18F2455.INC                       576*  596*
+TRISB4                            C   P18F2455.INC                       577*  597*
+TRISB5                            C   P18F2455.INC                       578*  598*
+TRISB6                            C   P18F2455.INC                       579*  599*
+TRISB7                            C   P18F2455.INC                       580*  600*
+TRISC                             C   P18F2455.INC                       105*  106*
+TRISC0                            C   P18F2455.INC                       613*  627*
+TRISC1                            C   P18F2455.INC                       614*  628*
+TRISC2                            C   P18F2455.INC                       615*  629*
+TRISC6                            C   P18F2455.INC                       616*  630*
+TRISC7                            C   P18F2455.INC                       617*  631*
+TRMT                              C   P18F2455.INC                       744*
+TRNIE                             C   P18F2455.INC                       247*
+TRNIF                             C   P18F2455.INC                       237*
+TUN0                              C   P18F2455.INC                       643*
+TUN1                              C   P18F2455.INC                       644*
+TUN2                              C   P18F2455.INC                       645*
+TUN3                              C   P18F2455.INC                       646*
+TUN4                              C   P18F2455.INC                       647*
+TV1                               M   RC5_LIB.ASM                         41*
+TX                                C   P18F2455.INC                       493*
+TX9                               C   P18F2455.INC                       749*
+TX9D                              C   P18F2455.INC                       743*
+TXCKP                             C   P18F2455.INC                       825*  838*
+TXEN                              C   P18F2455.INC                       748*
+TXIE                              C   P18F2455.INC                       655*
+TXIF                              C   P18F2455.INC                       665*
+TXIP                              C   P18F2455.INC                       675*
+TXREG                             C   P18F2455.INC                       120*
+TXSTA                             C   P18F2455.INC                       119*
+ToggByte                          A   RC5_LIB.ASM                         57*   62*  141.  143.
+UA                                C   P18F2455.INC                       927*
+MPASM  5.48                       RC5_LIB.ASM   4-16-2013  21:58:38         PAGE 13
+
+                          MPASM Cross Reference File
+
+LABEL                            TYPE FILE NAME                  SOURCE FILE REFERENCES
+-----                            ---- ---------                  ----------------------
+
+UADDR                             C   P18F2455.INC                        76*
+UCFG                              C   P18F2455.INC                        77*
+UCON                              C   P18F2455.INC                        75*
+UEIE                              C   P18F2455.INC                        73*
+UEIR                              C   P18F2455.INC                        72*
+UEP0                              C   P18F2455.INC                        78*
+UEP1                              C   P18F2455.INC                        79*
+UEP10                             C   P18F2455.INC                        88*
+UEP11                             C   P18F2455.INC                        89*
+UEP12                             C   P18F2455.INC                        90*
+UEP13                             C   P18F2455.INC                        91*
+UEP14                             C   P18F2455.INC                        92*
+UEP15                             C   P18F2455.INC                        93*
+UEP2                              C   P18F2455.INC                        80*
+UEP3                              C   P18F2455.INC                        81*
+UEP4                              C   P18F2455.INC                        82*
+UEP5                              C   P18F2455.INC                        83*
+UEP6                              C   P18F2455.INC                        84*
+UEP7                              C   P18F2455.INC                        85*
+UEP8                              C   P18F2455.INC                        86*
+UEP9                              C   P18F2455.INC                        87*
+UERRIE                            C   P18F2455.INC                       245*
+UERRIF                            C   P18F2455.INC                       235*
+UFRM                              C   P18F2455.INC                        67*
+UFRMH                             C   P18F2455.INC                        69*
+UFRML                             C   P18F2455.INC                        68*
+UIE                               C   P18F2455.INC                        71*
+UIR                               C   P18F2455.INC                        70*
+UOEMON                            C   P18F2455.INC                       304*
+UPUEN                             C   P18F2455.INC                       303*
+URSTIE                            C   P18F2455.INC                       244*
+URSTIF                            C   P18F2455.INC                       234*
+USBEN                             C   P18F2455.INC                       284*
+USBIE                             C   P18F2455.INC                       686*
+USBIF                             C   P18F2455.INC                       699*
+USBIP                             C   P18F2455.INC                       712*
+USTAT                             C   P18F2455.INC                        74*
+UTEYE                             C   P18F2455.INC                       305*
+UTRDIS                            C   P18F2455.INC                       302*
+VCFG0                             C   P18F2455.INC                       881*
+VCFG1                             C   P18F2455.INC                       882*
+VDIRMAG                           C   P18F2455.INC                      1011* 1035*
+VOLDOWN_CMD                       M   RC5_LIB.ASM                         47*
+VOLUP_CMD                         M   RC5_LIB.ASM                         46*
+VREFM                             C   P18F2455.INC                       456*
+VREFP                             C   P18F2455.INC                       457*
+W                                 C   P18F2455.INC                        45*
+WCOL                              C   P18F2455.INC                       917*
+WDTCON                            C   P18F2455.INC                       163*
+WR                                C   P18F2455.INC                       721*
+WREG                              C   P18F2455.INC                       187*
+WREN                              C   P18F2455.INC                       722*
+MPASM  5.48                       RC5_LIB.ASM   4-16-2013  21:58:38         PAGE 14
+
+                          MPASM Cross Reference File
+
+LABEL                            TYPE FILE NAME                  SOURCE FILE REFERENCES
+-----                            ---- ---------                  ----------------------
+
+WRERR                             C   P18F2455.INC                       723*
+WUE                               C   P18F2455.INC                       823*  836*
+Z                                 C   P18F2455.INC                      1084*
+_BORV_0_2L                        C   P18F2455.INC                      1435*
+_BORV_1_2L                        C   P18F2455.INC                      1436*
+_BORV_2_2L                        C   P18F2455.INC                      1437*
+_BORV_3_2L                        C   P18F2455.INC                      1438*
+_BOR_OFF_2L                       C   P18F2455.INC                      1430*
+_BOR_ON_2L                        C   P18F2455.INC                      1433*
+_BOR_ON_ACTIVE_2L                 C   P18F2455.INC                      1432*
+_BOR_SOFT_2L                      C   P18F2455.INC                      1431*
+_CCP2MX_OFF_3H                    C   P18F2455.INC                      1465*
+_CCP2MX_ON_3H                     C   P18F2455.INC                      1466*
+_CONFIG1H                         C   P18F2455.INC                      1376*
+_CONFIG1L                         C   P18F2455.INC                      1375*
+_CONFIG2H                         C   P18F2455.INC                      1378*
+_CONFIG2L                         C   P18F2455.INC                      1377*
+_CONFIG3H                         C   P18F2455.INC                      1379*
+_CONFIG4L                         C   P18F2455.INC                      1380*
+_CONFIG5H                         C   P18F2455.INC                      1382*
+_CONFIG5L                         C   P18F2455.INC                      1381*
+_CONFIG6H                         C   P18F2455.INC                      1384*
+_CONFIG6L                         C   P18F2455.INC                      1383*
+_CONFIG7H                         C   P18F2455.INC                      1386*
+_CONFIG7L                         C   P18F2455.INC                      1385*
+_CP0_OFF_5L                       C   P18F2455.INC                      1492*
+_CP0_ON_5L                        C   P18F2455.INC                      1491*
+_CP1_OFF_5L                       C   P18F2455.INC                      1495*
+_CP1_ON_5L                        C   P18F2455.INC                      1494*
+_CP2_OFF_5L                       C   P18F2455.INC                      1498*
+_CP2_ON_5L                        C   P18F2455.INC                      1497*
+_CPB_OFF_5H                       C   P18F2455.INC                      1502*
+_CPB_ON_5H                        C   P18F2455.INC                      1501*
+_CPD_OFF_5H                       C   P18F2455.INC                      1505*
+_CPD_ON_5H                        C   P18F2455.INC                      1504*
+_CPUDIV_OSC1_PLL2_1L              C   P18F2455.INC                      1398*
+_CPUDIV_OSC2_PLL3_1L              C   P18F2455.INC                      1399*
+_CPUDIV_OSC3_PLL4_1L              C   P18F2455.INC                      1400*
+_CPUDIV_OSC4_PLL6_1L              C   P18F2455.INC                      1401*
+_DEBUG_OFF_4L                     C   P18F2455.INC                      1488*
+_DEBUG_ON_4L                      C   P18F2455.INC                      1487*
+_DEVID1                           C   P18F2455.INC                      1543*
+_DEVID2                           C   P18F2455.INC                      1544*
+_EBTR0_OFF_7L                     C   P18F2455.INC                      1529*
+_EBTR0_ON_7L                      C   P18F2455.INC                      1528*
+_EBTR1_OFF_7L                     C   P18F2455.INC                      1532*
+_EBTR1_ON_7L                      C   P18F2455.INC                      1531*
+_EBTR2_OFF_7L                     C   P18F2455.INC                      1535*
+_EBTR2_ON_7L                      C   P18F2455.INC                      1534*
+_EBTRB_OFF_7H                     C   P18F2455.INC                      1539*
+_EBTRB_ON_7H                      C   P18F2455.INC                      1538*
+_FCMEN_OFF_1H                     C   P18F2455.INC                      1420*
+MPASM  5.48                       RC5_LIB.ASM   4-16-2013  21:58:38         PAGE 15
+
+                          MPASM Cross Reference File
+
+LABEL                            TYPE FILE NAME                  SOURCE FILE REFERENCES
+-----                            ---- ---------                  ----------------------
+
+_FCMEN_ON_1H                      C   P18F2455.INC                      1421*
+_FOSC_ECIO_EC_1H                  C   P18F2455.INC                      1409*
+_FOSC_ECPLLIO_EC_1H               C   P18F2455.INC                      1411*
+_FOSC_ECPLL_EC_1H                 C   P18F2455.INC                      1412*
+_FOSC_EC_EC_1H                    C   P18F2455.INC                      1410*
+_FOSC_HSPLL_HS_1H                 C   P18F2455.INC                      1418*
+_FOSC_HS_1H                       C   P18F2455.INC                      1417*
+_FOSC_INTOSCIO_EC_1H              C   P18F2455.INC                      1413*
+_FOSC_INTOSC_EC_1H                C   P18F2455.INC                      1414*
+_FOSC_INTOSC_HS_1H                C   P18F2455.INC                      1416*
+_FOSC_INTOSC_XT_1H                C   P18F2455.INC                      1415*
+_FOSC_XTPLL_XT_1H                 C   P18F2455.INC                      1408*
+_FOSC_XT_XT_1H                    C   P18F2455.INC                      1407*
+_IDLOC0                           C   P18F2455.INC                      1547*
+_IDLOC1                           C   P18F2455.INC                      1548*
+_IDLOC2                           C   P18F2455.INC                      1549*
+_IDLOC3                           C   P18F2455.INC                      1550*
+_IDLOC4                           C   P18F2455.INC                      1551*
+_IDLOC5                           C   P18F2455.INC                      1552*
+_IDLOC6                           C   P18F2455.INC                      1553*
+_IDLOC7                           C   P18F2455.INC                      1554*
+_IESO_OFF_1H                      C   P18F2455.INC                      1423*
+_IESO_ON_1H                       C   P18F2455.INC                      1424*
+_LPT1OSC_OFF_3H                   C   P18F2455.INC                      1471*
+_LPT1OSC_ON_3H                    C   P18F2455.INC                      1472*
+_LVP_OFF_4L                       C   P18F2455.INC                      1481*
+_LVP_ON_4L                        C   P18F2455.INC                      1482*
+_MCLRE_OFF_3H                     C   P18F2455.INC                      1474*
+_MCLRE_ON_3H                      C   P18F2455.INC                      1475*
+_PBADEN_OFF_3H                    C   P18F2455.INC                      1468*
+_PBADEN_ON_3H                     C   P18F2455.INC                      1469*
+_PLLDIV_10_1L                     C   P18F2455.INC                      1395*
+_PLLDIV_12_1L                     C   P18F2455.INC                      1396*
+_PLLDIV_1_1L                      C   P18F2455.INC                      1389*
+_PLLDIV_2_1L                      C   P18F2455.INC                      1390*
+_PLLDIV_3_1L                      C   P18F2455.INC                      1391*
+_PLLDIV_4_1L                      C   P18F2455.INC                      1392*
+_PLLDIV_5_1L                      C   P18F2455.INC                      1393*
+_PLLDIV_6_1L                      C   P18F2455.INC                      1394*
+_PWRT_OFF_2L                      C   P18F2455.INC                      1428*
+_PWRT_ON_2L                       C   P18F2455.INC                      1427*
+_STVREN_OFF_4L                    C   P18F2455.INC                      1478*
+_STVREN_ON_4L                     C   P18F2455.INC                      1479*
+_USBDIV_1_1L                      C   P18F2455.INC                      1403*
+_USBDIV_2_1L                      C   P18F2455.INC                      1404*
+_VREGEN_OFF_2L                    C   P18F2455.INC                      1440*
+_VREGEN_ON_2L                     C   P18F2455.INC                      1441*
+_WDTPS_1024_2H                    C   P18F2455.INC                      1457*
+_WDTPS_128_2H                     C   P18F2455.INC                      1454*
+_WDTPS_16384_2H                   C   P18F2455.INC                      1461*
+_WDTPS_16_2H                      C   P18F2455.INC                      1451*
+_WDTPS_1_2H                       C   P18F2455.INC                      1447*
+MPASM  5.48                       RC5_LIB.ASM   4-16-2013  21:58:38         PAGE 16
+
+                          MPASM Cross Reference File
+
+LABEL                            TYPE FILE NAME                  SOURCE FILE REFERENCES
+-----                            ---- ---------                  ----------------------
+
+_WDTPS_2048_2H                    C   P18F2455.INC                      1458*
+_WDTPS_256_2H                     C   P18F2455.INC                      1455*
+_WDTPS_2_2H                       C   P18F2455.INC                      1448*
+_WDTPS_32768_2H                   C   P18F2455.INC                      1462*
+_WDTPS_32_2H                      C   P18F2455.INC                      1452*
+_WDTPS_4096_2H                    C   P18F2455.INC                      1459*
+_WDTPS_4_2H                       C   P18F2455.INC                      1449*
+_WDTPS_512_2H                     C   P18F2455.INC                      1456*
+_WDTPS_64_2H                      C   P18F2455.INC                      1453*
+_WDTPS_8192_2H                    C   P18F2455.INC                      1460*
+_WDTPS_8_2H                       C   P18F2455.INC                      1450*
+_WDT_OFF_2H                       C   P18F2455.INC                      1444*
+_WDT_ON_2H                        C   P18F2455.INC                      1445*
+_WRT0_OFF_6L                      C   P18F2455.INC                      1509*
+_WRT0_ON_6L                       C   P18F2455.INC                      1508*
+_WRT1_OFF_6L                      C   P18F2455.INC                      1512*
+_WRT1_ON_6L                       C   P18F2455.INC                      1511*
+_WRT2_OFF_6L                      C   P18F2455.INC                      1515*
+_WRT2_ON_6L                       C   P18F2455.INC                      1514*
+_WRTB_OFF_6H                      C   P18F2455.INC                      1522*
+_WRTB_ON_6H                       C   P18F2455.INC                      1521*
+_WRTC_OFF_6H                      C   P18F2455.INC                      1519*
+_WRTC_ON_6H                       C   P18F2455.INC                      1518*
+_WRTD_OFF_6H                      C   P18F2455.INC                      1525*
+_WRTD_ON_6H                       C   P18F2455.INC                      1524*
+_XINST_OFF_4L                     C   P18F2455.INC                      1484*
+_XINST_ON_4L                      C   P18F2455.INC                      1485*
+__18F2455                         V   RC5_LIB.ASM                          0*
+                                      P18F2455.INC                        32.
+delay_1ms                         A   RC5_LIB.ASM                        404*
+
+
+LABEL TYPES
+-----------
+A  Address 
+C  Constant
+E  External
+M  Macro   
+S  Segment 
+U  Unknown 
+V  Variable
+X  Other   

@@ -1,0 +1,339 @@
+commit 119b7cc9ab323f854b1274db213fd986b063e1ca
+Author: Morgan <morgansstuart243@gmail.com>
+Date:   Sun May 19 14:18:18 2013 -0400
+
+    Idle stage added; Turning badge over goes to idle
+    
+    This requires and extra bit set in acclerometer setup. May want to
+    debounce the orientation changes to make it a bit smoother and user
+    friendly.
+
+commit e34696031356e878721d3c60cd4306f8b238a579
+Author: Morgan <morgansstuart243@gmail.com>
+Date:   Sun May 19 12:58:06 2013 -0400
+
+    More GoL support; Stage function ptr
+    
+    New IR sending methods were added and put to use. The usb version can
+    now send out food or attacks and the a badge in GoL mode will respond.
+    With either the section win (food) or a new "hurt" led and audio
+    sequence (when the badge is attacked). Just an early version, lots
+     of features needed, but the proof is there.
+
+commit 62fa1fd7599f6cf8f2a35b3740c744546f826114
+Author: Morgan <morgansstuart243@gmail.com>
+Date:   Fri May 17 15:06:44 2013 -0400
+
+    Moved un-manchestering and packet unpack out of stages
+    
+    Ping no longer handled individually by each stage, the main loop will
+    setup up the response and enqueue it. If not a ping, the response is
+    left to the stage. Greatly simplifies and cleans up stage code.
+
+commit 296da99c4d68b4c502af6766983ad240e5f085c8
+Author: Morgan <morgansstuart243@gmail.com>
+Date:   Fri May 17 14:22:36 2013 -0400
+
+    Added irResp_ev for handling backoffs for IR send data
+    
+    Fixed a few other non-critical bugs
+
+commit 675c1cd20aa43fbf399b498f371a3e80f07e6a09
+Author: Morgan <morgansstuart243@gmail.com>
+Date:   Fri May 17 11:17:02 2013 -0400
+
+    Nasty bug fixed! Don't set IR_listening willy-nilly...
+
+commit ae7a2e4294a103e9642b61249ad72b2792e5af38
+Author: Morgan <morgansstuart243@gmail.com>
+Date:   Fri May 17 10:47:06 2013 -0400
+
+    Fruitless debugging attempts
+
+commit eabdf996179688bf83f018db60e3a96edaadc7d9
+Author: Morgan_laptop <morgansstuart243@gmail.com>
+Date:   Wed May 15 19:14:49 2013 -0400
+
+    Added missing IR_LISTENING and IRbits=0 assignments
+
+commit d88b6e5b9570ae958ed641e358631b8f9d47b6e1
+Author: Morgan <morgansstuart243@gmail.com>
+Date:   Wed May 15 00:32:38 2013 -0400
+
+    Added death LED sequence for game of life
+
+commit 31cdf4c5ff530c7eee5cfd92e58e3a3d6ebd3b6d
+Author: Morgan <morgansstuart243@gmail.com>
+Date:   Wed May 15 00:09:28 2013 -0400
+
+    Basic game of life mechanics added to licing stage
+    
+    HP based on accel values (these will be populated from the balance
+    stage, though we could poll accelerometer on stage setup). Once badge hp
+    lower than 15, piezo starts buzzing.
+
+commit ba3a4818d7fe4e95a458d4380b6978dc6eec1cc7
+Author: Morgan <morgansstuart243@gmail.com>
+Date:   Tue May 14 23:22:20 2013 -0400
+
+    Game of Life methods and protocol added
+    
+    No real implementation yet
+
+commit 1b5992915f196125e07bc917bd4ffb9e3cf4eb94
+Author: Morgan_laptop <morgansstuart243@gmail.com>
+Date:   Tue May 14 17:10:33 2013 -0400
+
+    Ping added to all stages; setup_ev added to all stages
+
+commit d16f1eddd4f99056abfd9224f5fe0e6ec87e8249
+Author: Morgan <morgansstuart243@gmail.com>
+Date:   Mon May 13 00:22:21 2013 -0400
+
+    Balance stage added; check accel fix; setup event
+
+commit 49e50bc534a742d5bdd8945c3171ac6181720ec4
+Author: Morgan <morgansstuart243@gmail.com>
+Date:   Sun May 12 22:49:58 2013 -0400
+
+    Station outputs to usb after IR; irRec_ev; ping support
+    
+    ping support in only a few (one?) stages
+
+commit b9388b64d2000c180c16cc44ea3e7bc05b17577e
+Author: Morgan <morgansstuart243@gmail.com>
+Date:   Sun May 12 17:13:50 2013 -0400
+
+    BaseStation beeps on ir receive; refined green_led usage
+    
+    In the peer count stage, the leds display the number of peers you've met.
+
+commit 2d85a5b20148e61ae94e25cac7d318b96c98bb6b
+Author: Morgan <morgansstuart243@gmail.com>
+Date:   Sun May 12 15:36:16 2013 -0400
+
+    Peer Count request-respond working
+    
+    Early stages, but it works, still a few things to be implemented for
+    this stage though.
+    
+    Also added a null led_seq, just an empty method to direct the led_seq
+    pointer to if you want to end led sequences. Didn't think setting it to
+    null was a good idea, but maybe it would be okay...
+
+commit 9e9ef22f0dc7f4d39943e61c3a6099258b7db639
+Author: Morgan <morgansstuart243@gmail.com>
+Date:   Sat May 11 23:36:35 2013 -0400
+
+    Protocol defines; payload creation/parsing bug fix
+
+commit 0ff38500e56a68abc5e8fc60027bf54f79437111
+Author: Morgan <morgansstuart243@gmail.com>
+Date:   Sat May 11 22:36:36 2013 -0400
+
+    Led sequences with function pointer; cleaning up
+    
+    To do a led sequence, simple enqueue an led_ev and then set the led_seq
+    function pointer to the function to be called.
+    
+    Some other aspects of the code should probably get similar treatment
+
+commit 5611f17008acada4e99b4a5949bda5ff9056428d
+Author: Morgan <morgansstuart243@gmail.com>
+Date:   Sat May 11 20:18:10 2013 -0400
+
+    PeerCount Stage added with sonar led sequence
+    
+    the stage following the cylon seek will be a peer-seeking stage; users
+    have to face another user and initiate a communication (maybe using the
+    button). See doc for details.
+
+commit f20bfd960b83b574758fe20b49a533775ff68577
+Author: Morgan S <morgansstuart243@gmail.com>
+Date:   Sat May 11 19:33:21 2013 -0400
+
+    base_station_cylon.sh runs cylon base station
+    
+    Script sets the mode to base station and then echos 'c' every second.
+
+commit 36ea60d2e837a38a5a82ba766abce0fea3b32570
+Author: Morgan <morgansstuart243@gmail.com>
+Date:   Sat May 11 19:30:57 2013 -0400
+
+    Fixed reset bug, in wrong place to work correctly
+
+commit c36dafeebc2e4028457f00a5a0da652854c5cf80
+Author: Morgan <morgansstuart243@gmail.com>
+Date:   Sat May 11 19:27:50 2013 -0400
+
+    Clean up, commenting; added mode reset to usb 'R'
+
+commit 848999b1633dae7c84b3a13ac9a2b1e166d52633
+Author: Morgan <morgansstuart243@gmail.com>
+Date:   Sat May 11 18:46:28 2013 -0400
+
+    Base protocol support and features demoing it
+    
+    Game code now responds to a 0x03:0x01 ir message. USB runtime can enter
+    "base-station" mode by pressing 't', then press c to send out a cylon
+    seek message. This should allow us to script the base stations, allowing
+    us to adjust the rate and what's actually being sent externally rather
+    than recompiling.
+
+commit 3918bc9cc235ce2ca737f721a6e326661a74e070
+Author: Morgan <morgansstuart243@gmail.com>
+Date:   Sat May 11 16:33:31 2013 -0400
+
+    Support for IR receiving in Game code
+    
+    externed relavent variables and included a simple test in the cylon
+    stage to prove that IR works in the game. This test works great, next
+    step is to make some of the more general meothds used in user.c
+    available to game.c.
+
+commit cdcffefbb3bd1df98e614c39f04a30238d94935c
+Author: Morgan <morgansstuart243@gmail.com>
+Date:   Fri May 10 15:05:24 2013 -0400
+
+    stageWin sequence added; audio added to cylon seek
+
+commit 89e8c9060d9b71007e4cefd08052b12ca016ee8e
+Author: Morgan <morgansstuart243@gmail.com>
+Date:   Fri May 10 14:24:56 2013 -0400
+
+    Added/changed sound to sequences/stages
+    
+    welcome sequence sound plays well with the leds. sectionWin sequence now
+    works and sounds okay. Also, added audio queues to the fib stage; beeps
+    per a fib numbers, this should help people realize that they need zero
+    and two ones.
+
+commit 5d89103fa40b400914a684e4914255bcf1c70bf1
+Author: Morgan_laptop <morgansstuart243@gmail.com>
+Date:   Thu May 9 22:54:58 2013 -0400
+
+    testing/implementing sectionWin led sequence
+    
+    unfinished
+
+commit a709e6b3edba4045c259ab7f776cedd3f984a352
+Author: Morgan <morgansstuart243@gmail.com>
+Date:   Thu May 9 18:31:08 2013 -0400
+
+    Add section-win led seq
+    
+    Starting to use it in mimicry
+
+commit 088f0556ce26cadbf842f421cc486aad002e5926
+Author: Morgan <morgansstuart243@gmail.com>
+Date:   Thu May 9 17:36:09 2013 -0400
+
+    Changed opening sounds a little
+    
+    Fib demo moves to cylon seek after you hit 15 from tapping. I don't have
+    a badge with a button so this stage's full implementation will have to
+    wait.
+
+commit 9983ae1b916d7bcdd161348548f085880a9d1faf
+Author: Morgan <morgansstuart243@gmail.com>
+Date:   Thu May 9 17:00:52 2013 -0400
+
+    Cylon sequence fixed up
+    
+    Now rentrant and it actually looks like the cylon scanner instead of
+    knight rider.
+
+commit e9fe8ee9f492ea20b852063b818ea7f107cf6dd9
+Author: Morgan S <morgansstuart243@gmail.com>
+Date:   Thu May 9 14:55:28 2013 -0400
+
+    Fib Stage no longer uses delays
+
+commit f2301d43937b12b8447f49234907fa12410fa1b8
+Author: Morgan S <morgansstuart243@gmail.com>
+Date:   Tue May 7 20:44:02 2013 -0400
+
+    Added loading noise to startup sequence
+
+commit 6ce337b13410fe87e677be91939a1b84aa4bf0ba
+Author: Morgan S <morgansstuart243@gmail.com>
+Date:   Tue May 7 20:33:21 2013 -0400
+
+    Use of usbBusSense() at startup
+
+commit ff86e43d5fe0f662775d26e5ccd1a012048dc8a6
+Author: Morgan_laptop <morgansstuart243@gmail.com>
+Date:   Tue May 7 16:37:47 2013 -0400
+
+    Welcome and Mimicry stages now re-entrant
+    
+    No more use of delays, still need to test usb
+
+commit 17865ee85f822c78ccd9714327fe579b69591bd1
+Author: Morgan S <morgansstuart243@gmail.com>
+Date:   Wed May 1 23:15:54 2013 -0400
+
+    Some clean up & restoration of commented code
+    
+    Also, trying to get the piezo to play in Game code, not working yet.
+
+commit c89cf81656296f6c2b032c1e28e6cac415f91e73
+Author: Morgan S <morgansstuart243@gmail.com>
+Date:   Wed May 1 22:32:23 2013 -0400
+
+    Remove morgan_code.c; Game implemented along side previous
+    
+    Intended function: if the badge is plugged into usb, then the ProcessIO
+    method is called, if not, the Run_Game() method is called. Currently
+    havent been able to test this since my badge's usb seems to be flaky (or
+    all my computer's usbs are).
+
+commit 5771421b482a9100fa2be92131040c0ebf615588
+Author: Morgan S <morgansstuart243@gmail.com>
+Date:   Wed May 1 17:55:51 2013 -0400
+
+    Run_Game Method added, further integration
+    
+    Problem with USB sense and USB in general, badge no longer showing up as
+    device on computer.
+
+commit 593e6fcd567ea4930ebd2a8dc2673471b65c3161
+Author: Morgan S <morgansstuart243@gmail.com>
+Date:   Wed May 1 16:41:14 2013 -0400
+
+    Other c files neede minor changes
+    
+    makefile changes added to since the build has changed
+
+commit d9be9e683e0697a22887d6e1f64d0c57c5c58e5f
+Author: Morgan S <morgansstuart243@gmail.com>
+Date:   Wed May 1 16:37:09 2013 -0400
+
+    game files added
+    
+    Files added, fixed redefinition errors from the changes, though
+    exeuction/functionality has not changed yet.
+
+commit 8a54a951bb94b32b6792220da81baf42f8745256
+Author: Morgan_laptop <morgansstuart243@gmail.com>
+Date:   Tue Apr 30 08:33:22 2013 -0400
+
+    A little bit of  commenting
+
+commit 578dd10772878cf2593ae08f83fbb79997069478
+Author: Paul Bruggeman <bruggemn@gmail.com>
+Date:   Thu Apr 25 10:08:56 2013 -0400
+
+     full demo works again. writes were blocking because read buffer was full
+
+commit fe074cdc7fc65391f26105060e2e8b4df503fc87
+Author: Paul Bruggeman <bruggemn@gmail.com>
+Date:   Wed Apr 24 22:17:00 2013 -0400
+
+     documenting and tweaking user.c
+
+commit ed8f4bbaa4ed67dd1ef8af68e9d92cee49715bfd
+Author: Paul Bruggeman <bruggemn@gmail.com>
+Date:   Sat Apr 20 11:35:33 2013 -0400
+
+    initial commit

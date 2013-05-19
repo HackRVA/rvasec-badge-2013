@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="62">
+  <logicalFolder name="root" displayName="root" projectFiles="true">
+    <logicalFolder name="HeaderFiles"
+                   displayName="Header Files"
+                   projectFiles="true">
+      <itemPath>autofiles/usbcfg.h</itemPath>
+      <itemPath>autofiles/usbdsc.h</itemPath>
+      <itemPath>system/typedefs.h</itemPath>
+      <itemPath>system/interrupt/interrupt.h</itemPath>
+      <itemPath>system/usb/usb.h</itemPath>
+      <itemPath>system/usb/usb_compile_time_validation.h</itemPath>
+      <itemPath>system/usb/usbmmap.h</itemPath>
+      <itemPath>system/usb/usbdrv/usbdrv.h</itemPath>
+      <itemPath>system/usb/usbdefs/usbdefs_ep0_buff.h</itemPath>
+      <itemPath>system/usb/usbdefs/usbdefs_std_dsc.h</itemPath>
+      <itemPath>system/usb/usbctrltrf/usbctrltrf.h</itemPath>
+      <itemPath>system/usb/usb9/usb9.h</itemPath>
+      <itemPath>system/usb/class/cdc/cdc.h</itemPath>
+      <itemPath>common.h</itemPath>
+      <itemPath>game.h</itemPath>
+    </logicalFolder>
+    <logicalFolder name="LinkerScript"
+                   displayName="Linker Files"
+                   projectFiles="true">
+      <itemPath>18f2455_g.lkr</itemPath>
+    </logicalFolder>
+    <logicalFolder name="SourceFiles"
+                   displayName="Source Files"
+                   projectFiles="true">
+      <itemPath>game.c</itemPath>
+      <itemPath>common.c</itemPath>
+      <itemPath>user/user.c</itemPath>
+      <itemPath>main.c</itemPath>
+      <itemPath>RC5_lib.asm</itemPath>
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false">
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
+  </logicalFolder>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="default" type="2">
+      <toolsSet>
+        <developmentServer>localhost</developmentServer>
+        <targetDevice>PIC18F2455</targetDevice>
+        <targetHeader></targetHeader>
+        <targetPluginBoard></targetPluginBoard>
+        <platformTool>PICkit2PlatformTool</platformTool>
+        <languageToolchain>C18</languageToolchain>
+        <languageToolchainVersion>3.40</languageToolchainVersion>
+        <platform>2</platform>
+      </toolsSet>
+      <compileType>
+        <linkerTool>
+          <linkerLibItems>
+            <linkerLibFileItem>obj/cdc.o</linkerLibFileItem>
+            <linkerLibFileItem>obj/i2c_ack.o</linkerLibFileItem>
+            <linkerLibFileItem>obj/i2c_clos.o</linkerLibFileItem>
+            <linkerLibFileItem>obj/i2c_dtrd.o</linkerLibFileItem>
+            <linkerLibFileItem>obj/i2c_eeap.o</linkerLibFileItem>
+            <linkerLibFileItem>obj/i2c_eebw.o</linkerLibFileItem>
+            <linkerLibFileItem>obj/i2c_eecr.o</linkerLibFileItem>
+            <linkerLibFileItem>obj/i2c_eepw.o</linkerLibFileItem>
+            <linkerLibFileItem>obj/i2c_eerr.o</linkerLibFileItem>
+            <linkerLibFileItem>obj/i2c_eesr.o</linkerLibFileItem>
+            <linkerLibFileItem>obj/i2c_gets.o</linkerLibFileItem>
+            <linkerLibFileItem>obj/i2c_idle.o</linkerLibFileItem>
+            <linkerLibFileItem>obj/i2c_nack.o</linkerLibFileItem>
+            <linkerLibFileItem>obj/i2c_open.o</linkerLibFileItem>
+            <linkerLibFileItem>obj/i2c_puts.o</linkerLibFileItem>
+            <linkerLibFileItem>obj/i2c_read.o</linkerLibFileItem>
+            <linkerLibFileItem>obj/i2c_rstr.o</linkerLibFileItem>
+            <linkerLibFileItem>obj/i2c_stop.o</linkerLibFileItem>
+            <linkerLibFileItem>obj/i2c_strt.o</linkerLibFileItem>
+            <linkerLibFileItem>obj/i2c_writ.o</linkerLibFileItem>
+            <linkerLibFileItem>obj/usb9.o</linkerLibFileItem>
+            <linkerLibFileItem>obj/usbctrltrf.o</linkerLibFileItem>
+            <linkerLibFileItem>obj/usbdrv.o</linkerLibFileItem>
+            <linkerLibFileItem>obj/usbdsc.o</linkerLibFileItem>
+            <linkerLibFileItem>obj/usbmmap.o</linkerLibFileItem>
+          </linkerLibItems>
+        </linkerTool>
+        <loading>
+          <useAlternateLoadableFile>false</useAlternateLoadableFile>
+          <alternateLoadableFile></alternateLoadableFile>
+        </loading>
+      </compileType>
+      <makeCustomizationType>
+        <makeCustomizationPreStepEnabled>false</makeCustomizationPreStepEnabled>
+        <makeCustomizationPreStep></makeCustomizationPreStep>
+        <makeCustomizationPostStepEnabled>false</makeCustomizationPostStepEnabled>
+        <makeCustomizationPostStep></makeCustomizationPostStep>
+        <makeCustomizationPutChecksumInUserID>false</makeCustomizationPutChecksumInUserID>
+        <makeCustomizationEnableLongLines>false</makeCustomizationEnableLongLines>
+        <makeCustomizationNormalizeHexFile>false</makeCustomizationNormalizeHexFile>
+      </makeCustomizationType>
+      <C18>
+      </C18>
+      <C18-AS>
+      </C18-AS>
+      <C18-LD>
+      </C18-LD>
+      <C18LanguageToolchain>
+      </C18LanguageToolchain>
+      <PICkit2PlatformTool>
+      </PICkit2PlatformTool>
+    </conf>
+  </confs>
+</configurationDescriptor>
