@@ -31,7 +31,7 @@ extern volatile byte DataByte, AddrByte, ToggByte;
 unsigned char usbOn;
 extern volatile unsigned char int_tilt_count;
 extern struct event_buffer main_ev;
-
+extern unsigned char badge_id;
 
 // global ram variables
 #pragma udata
@@ -554,7 +554,7 @@ static unsigned char usbCheck=0xFF;
 // the Init() code
 //
 unsigned char usbBusSense() {
-//#define DEV
+#define DEV
 #ifdef DEV
     if (usbCheck == 0xFF) usbCheck = (PORTCbits.RC2 != 0);  // DEV version, usbCheck=1 (USB on), switch is not pressed/1
 #else
@@ -654,6 +654,22 @@ void ProcessIO(void)
                         
                         break;
                     }
+                    case(type_ping_req):
+                    {
+                            do_callback = 0x01;
+
+                            output_buffer[0] = 'R';
+                            output_buffer[1] = 'e';
+                            output_buffer[2] = 's';
+                            output_buffer[3] = 'p';
+                            output_buffer[4] = 'd';
+                            output_buffer[5] = '\n';
+                            output_buffer[6] = '\r';
+                            output_buffer[7] = '\0';
+                            putsUSBUSART((char *)output_buffer);
+
+                        break;
+                    }
                     case(type_ping_resp):
                     {
                             //set_leds(0xff ^ irPayload_data);
@@ -700,7 +716,12 @@ void ProcessIO(void)
     {
         do_callback = 0x00;
 
-        irCB_gSpecialResp(0x77);
+        if(irPayload_type == type_ping_req)
+        {
+            irCB_pingResp(badge_id);
+        }
+        else
+            irCB_gSpecialResp(badge_id);
     }
 
     // checkCount should only be incremented once per loop
