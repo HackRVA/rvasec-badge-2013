@@ -12,6 +12,8 @@
 //---IR Prtocol Defs---
 ///////////////////////
 
+
+
 //types
 #define type_ping_req 0x00
 #define type_ping_resp 0x01

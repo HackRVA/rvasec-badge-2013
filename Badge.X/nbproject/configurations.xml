@@ -106,6 +106,7 @@
       <C18LanguageToolchain>
       </C18LanguageToolchain>
       <PICkit2PlatformTool>
+        <property key="pk2settings.setvddvoltage" value="5.00"/>
       </PICkit2PlatformTool>
     </conf>
   </confs>

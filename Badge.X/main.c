@@ -206,22 +206,25 @@ void main(void)
 {
     extern unsigned char usbOn;
 
-    InitializeSystem();
+    
 
     if(!(usbOn = usbBusSense()))
-        Init_Game();
+        Init_Game();//init the game
+    else
+        InitializeSystem(); //init usb stuff
+
+    UserInit(); //init common items and interfaces
 
     while(1)
     {
-        USBTasks();         // USB Tasks
-
-            //is it plugged in? If not, return (USB BUS sense altered)
-            //if ((usb_device_state < CONFIGURED_STATE)||(UCONbits.SUSPND==1))
             if(!usbOn)
                 //call game loop
                 Run_Game();
             else
-                ProcessIO();        // See user\user.c & .h
+            {
+                USBTasks();
+                ProcessIO();        // See user\user.c & .h       
+            }
     }//end while
 }//end main
 
@@ -324,7 +327,7 @@ XXX
     #endif
     
     mInitializeUSBDriver();         // See usbdrv.h
-    UserInit();                     // See user.c & .h
+    //UserInit();                     // See user.c & .h
 
 }//end InitializeSystem
 

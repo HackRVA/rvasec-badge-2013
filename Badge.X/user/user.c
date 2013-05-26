@@ -25,6 +25,9 @@
 #define IR_BIT_LENGTH_DIV2   ((IR_BIT_LENGTH / 2) - 0)
 #define IR_BIT_LENGTH_DIV4   ((IR_BIT_LENGTH / 4) - 0/2)
 
+#define accel_on
+#define base_station
+
 /** globals for IR lib functions ********************************************************/
 extern void SendRC5(void);
 extern volatile byte DataByte, AddrByte, ToggByte;
@@ -283,12 +286,15 @@ void InterruptHandlerLow()
         PIR1bits.TMR1IF = 0;            //clear interrupt flag
     }
 
+
+#ifdef accel_on
     if(INTCON3bits.INT2IF) //check for INT2 (B2-Accel INT)
     {
          INTCON3bits.INT2IF = 0;  //clear flag
 
          int_tilt_count = ~int_tilt_count;
     }
+#endif
 }
 
 
@@ -331,16 +337,21 @@ void UserInit(void)
     LATC = 0;
 
     /* for morgan_code.c */
-    i2c_setup();
-    //INTCON3bits.INT2IE = 1;         //Enable INT2 == i2c  accelerator
-    INTCON3 = 0;
+    #ifdef accel_on
+        i2c_setup();
 
-    //Port B interrupt
-    INTCON3bits.INT2IP = 0;         //INT2 low priority
-    INTCON3bits.INT2IF = 0;         //Clear INT2 flag
-  //  INTCON2bits.RBPU = 0;           //pull up disable
-    INTCON2bits.INTEDG2 = 0;        //rising/falling (1/0)
-    INTCON3bits.INT2IE = 1;         //Enable INT2
+        //INTCON3bits.INT2IE = 1;         //Enable INT2 == i2c  accelerator
+        INTCON3 = 0;
+
+        //Port B interrupt
+        INTCON3bits.INT2IP = 0;         //INT2 low priority
+        INTCON3bits.INT2IF = 0;         //Clear INT2 flag
+      //  INTCON2bits.RBPU = 0;           //pull up disable
+        INTCON2bits.INTEDG2 = 0;        //rising/falling (1/0)
+        INTCON3bits.INT2IE = 1;         //Enable INT2
+    #else
+        INTCON3 = 0;
+    #endif
 
 
     //InitializeUSART();
@@ -554,7 +565,7 @@ static unsigned char usbCheck=0xFF;
 // the Init() code
 //
 unsigned char usbBusSense() {
-#define DEV
+//#define DEV
 #ifdef DEV
     if (usbCheck == 0xFF) usbCheck = (PORTCbits.RC2 != 0);  // DEV version, usbCheck=1 (USB on), switch is not pressed/1
 #else
