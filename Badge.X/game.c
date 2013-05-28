@@ -907,6 +907,25 @@ void Stage_GoL_Living()
 
                 green_leds = hp;
             }
+            else if(irPayload_type == type_GoL_L_hpTrade)
+            {
+                //set led event
+                enqueue(&main_ev, led_ev);
+
+                led_seq = led_seq_sectionWin;
+
+                //check for overflow on health
+                if( (255 - hp)<irPayload_data)
+                    hp = 255;
+                else
+                    hp += irPayload_data;
+
+                green_leds = hp;
+            }
+            else if(irPayload_type == data_gSpecial_virus)
+            {
+            
+            }
 
             break;
         }

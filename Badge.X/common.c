@@ -105,3 +105,16 @@ void irCB_GoLAttack(unsigned char amount)
 
     SendRC5();
 }
+
+void irCB_GoLTrade(unsigned char amount)
+{
+    ToggByte = (0b00100000 & amount) >> 5;
+    AddrByte = (0b00011111 & amount);
+
+    DataByte = type_GoL_L_hpTrade << 2;
+
+    //put the top two bits of the data at the 2 LSBs
+    DataByte |= (0b11000000 & amount)>>6;
+
+    SendRC5();
+}

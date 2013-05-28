@@ -1061,19 +1061,26 @@ void doUSBInput() {
             irCB_GoLFood(0x0A);
         }
 
-        //give food
+        //attack
         if(input_buffer[0] == 'a')
         {
             irCB_GoLAttack(0x0A);
         }
+
+        //give hp
+        if(input_buffer[0] == 'g')
+        {
+            irCB_GoLTrade(0x05);
+        }
     }
     else if(inputMode == 0x00)
     {
-        //change mode to base station
-        if (input_buffer[0] == 't') {
-            inputMode = 0x01;
-        }
-        
+        #ifdef base_station
+            //change mode to base station
+            if (input_buffer[0] == 't') {
+                inputMode = 0x01;
+            }
+        #endif
         // hit the space bar to dump info
         if (input_buffer[0] == ' ')  {
             inMenu = 1;

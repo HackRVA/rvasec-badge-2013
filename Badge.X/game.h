@@ -25,7 +25,7 @@
 #define vertical_normal_t 0x18
 
 //Enable features
-#define accel_on
+//#define accel_on
 #define base_station
 
 void Init_Game();
