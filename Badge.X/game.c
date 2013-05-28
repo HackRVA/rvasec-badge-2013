@@ -862,6 +862,7 @@ void Stage_GoL_Living()
         case(shake_ev):
         {
             //attack (needs to be changed to button event)
+            irCB_GoLFood(0x0A);
             break;
         }
         case(tap_ev):
@@ -870,6 +871,7 @@ void Stage_GoL_Living()
         }
         case(button_ev):
         {
+            irCB_GoLAttack(0x0A);
             break;
         }
         case(led_ev):
@@ -922,9 +924,18 @@ void Stage_GoL_Living()
 
                 green_leds = hp;
             }
-            else if(irPayload_type == data_gSpecial_virus)
+            else if(irPayload_type == type_game_special)
             {
-            
+                if(irPayload_data == data_gSpecial_virus)
+                {
+                    //set led event
+                    enqueue(&main_ev, led_ev);
+
+                    led_seq = led_seq_mutate;
+
+                    //current_stage = GoL_Zombie;
+                    run_stage = Stage_GoL_Zombie;
+                }
             }
 
             break;
@@ -1520,6 +1531,54 @@ void led_seq_hurt(void)
 
             //loading noise!
             timer1Value = freq[45 - i];
+            timer1Counts = TIMER1HZ / (timer1Value << 2);
+            PIE1bits.TMR1IE = 1;
+            T1CONbits.TMR1ON = 1;
+        }
+    }
+    else if ( j < 3)
+    {
+        //i = 0;
+        j++;
+        i = 0;
+        //sequence not over
+        enqueue(&main_ev, led_ev);
+    }
+    else
+    {
+        set_leds(green_leds);
+        led_seq = led_seq_null;
+        i = j = 0;
+    }
+}
+
+void led_seq_mutate(void)
+{
+    //persistent count
+    static unsigned char i = 0, j = 0;
+    static unsigned char count_tens = 0;
+
+    unsigned char led = 0x00;
+
+    if(i < 8 )
+    {
+        count_tens += 1;
+
+        //sequence not over
+        enqueue(&main_ev, led_ev);
+
+       if(count_tens > 20 + i)
+        {
+            count_tens = 0;
+
+            //shift out less and less
+            led = (i) + j;
+            set_leds(led);
+
+            i++;
+
+            //loading noise!
+            timer1Value = freq[55 - i];
             timer1Counts = TIMER1HZ / (timer1Value << 2);
             PIE1bits.TMR1IE = 1;
             T1CONbits.TMR1ON = 1;

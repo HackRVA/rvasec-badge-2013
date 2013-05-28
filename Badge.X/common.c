@@ -118,3 +118,16 @@ void irCB_GoLTrade(unsigned char amount)
 
     SendRC5();
 }
+
+void irCB_GoLMutate()
+{
+    ToggByte = (0b00100000 & data_gSpecial_virus) >> 5;
+    AddrByte = (0b00011111 & data_gSpecial_virus);
+
+    DataByte = type_game_special << 2;
+
+    //put the top two bits of the data at the 2 LSBs
+    DataByte |= (0b11000000 & data_gSpecial_virus)>>6;
+
+    SendRC5();
+}

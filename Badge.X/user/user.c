@@ -1072,6 +1072,12 @@ void doUSBInput() {
         {
             irCB_GoLTrade(0x05);
         }
+        
+        //mutate
+        if(input_buffer[0] == 'm')
+        {
+            irCB_GoLTrade(0x05);
+        }
     }
     else if(inputMode == 0x00)
     {

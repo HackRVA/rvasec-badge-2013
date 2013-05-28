@@ -57,6 +57,7 @@ void led_seq_stageWin(void);
 void led_seq_sonar(void);
 void led_seq_death(void); //oh no!
 void led_seq_hurt(void);
+void led_seq_mutate(void);
 
 void check_tilt(void);
 void check_accel(void);
