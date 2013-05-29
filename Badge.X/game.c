@@ -68,7 +68,7 @@ volatile unsigned char tilt = 0;
 
 //the badge id, you might say this is important
 //should be stored in flash, but for now this will do
-unsigned char badge_id = 100; //min is 55
+unsigned char badge_id = 10; //min is 55
 unsigned short backoff_time;// = base_backoff + badge_id;
 
 //keep track of game stage, start in welcome stage
