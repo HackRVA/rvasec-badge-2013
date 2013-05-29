@@ -1076,7 +1076,18 @@ void doUSBInput() {
         //mutate
         if(input_buffer[0] == 'm')
         {
-            irCB_GoLTrade(0x05);
+            irCB_GoLMutate();
+        }
+
+        //rally
+        if(input_buffer[0] == 'r')
+        {
+            irCB_GoLRally(200);
+        }
+
+        if(input_buffer[0] == 'z')
+        {
+            irCB_GoL_Z_Attack(10);
         }
     }
     else if(inputMode == 0x00)

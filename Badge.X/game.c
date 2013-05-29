@@ -39,6 +39,7 @@ extern volatile unsigned char DataByte;
 extern volatile short timer1Value;
 extern volatile short timer1Counts;
 extern rom far short freq[];
+
 #define TIMER1HZ 1000000
 #define TIMER1VAL 4096
 #pragma udata
@@ -85,7 +86,7 @@ struct event_buffer sleep_ev = { empty_ev,
                                 empty_ev};
 
 //function pointers replace switch case
-void (*run_stage)(void) = Stage_Welcome; //stage running now
+void (*run_stage)(void) = Stage_GoL_Living; //stage running now
 void (*return_stage)(void);          //stage to run after idle
 void (*led_seq)(void);               //led seq to run if led_ev
 void (*ir_resp)(unsigned char data); //ir method to run if irResp_ev
@@ -101,6 +102,7 @@ unsigned char seq = 0;
 unsigned char hp = 20;
 unsigned char errBits = 0x00;
 unsigned char send_data = 0x00;
+unsigned char next_life = reg_life;
 
 #pragma code
 void Init_Game()
@@ -862,7 +864,7 @@ void Stage_GoL_Living()
         case(shake_ev):
         {
             //attack (needs to be changed to button event)
-            irCB_GoLFood(0x0A);
+            irCB_GoLTrade(0x0A);
             break;
         }
         case(tap_ev):
@@ -909,6 +911,32 @@ void Stage_GoL_Living()
 
                 green_leds = hp;
             }
+            else if(irPayload_type == type_GoL_Z_attack)
+            {
+                //set led event
+                enqueue(&main_ev, led_ev);
+
+                led_seq = led_seq_hurt;
+
+                //turn into zombie if hit with less than 50 health
+                if(hp <50)
+                {
+                    //set led event
+                    enqueue(&main_ev, setup_ev);
+
+                    //current_stage = GoL_Zombie;
+                    run_stage = Stage_GoL_Purgatory;
+
+                    next_life = zombie_life;
+                }
+                else
+                {
+                    //check for overflow on health
+                    hp >>= 1;
+
+                    green_leds = hp;
+                }
+            }
             else if(irPayload_type == type_GoL_L_hpTrade)
             {
                 //set led event
@@ -929,12 +957,11 @@ void Stage_GoL_Living()
                 if(irPayload_data == data_gSpecial_virus)
                 {
                     //set led event
-                    enqueue(&main_ev, led_ev);
-
-                    led_seq = led_seq_mutate;
+                    enqueue(&main_ev, setup_ev);
 
                     //current_stage = GoL_Zombie;
-                    run_stage = Stage_GoL_Zombie;
+                    run_stage = Stage_GoL_Purgatory;
+                    next_life = zombie_life;
                 }
             }
 
@@ -966,8 +993,10 @@ void Stage_GoL_Living()
             set_leds(hp);
             if(!hp)
             {
-                led_seq = led_seq_death;
-                enqueue(&main_ev, led_ev);
+                run_stage = Stage_GoL_Purgatory;
+                //led_seq = led_seq_death;
+                enqueue(&main_ev, setup_ev);
+                next_life = reg_life;
             }
             else if(hp < 15)
             {
@@ -992,8 +1021,12 @@ void Stage_GoL_Zombie()
         {
             response_delay = 0; //reset IR backoff timer
             irPayload_type = 0xFF;
-            led_seq = led_seq_null;
-            //enqueue(&main_ev, led_ev);
+            iterator_count = 1000;
+            delay_count = 0;
+            seq = 0;
+            green_leds = 0b10111101;
+            led_seq = led_seq_mutate;
+            enqueue(&main_ev, led_ev);
             break;
         }
         case(tilt_ev):
@@ -1016,7 +1049,133 @@ void Stage_GoL_Zombie()
         case(led_ev):
         {
             led_seq();
+            return;
+        }
+        case(irRec_ev):
+        {
+            if(irPayload_type == type_GoL_L_attack)
+            {
+                if(green_leds)
+                {
+                    //set led event
+                    enqueue(&main_ev, led_ev);
+
+                    led_seq = led_seq_death;
+                }
+                else
+                {
+                    iterator_count -= 20;
+                }
+                
+            }
+            else if(irPayload_type == type_GoL_Z_rally)
+            {
+                //set led event
+                enqueue(&main_ev, led_ev);
+
+                led_seq = led_seq_sectionWin;
+
+                iterator_count -= irPayload_data;
+            }
+            else if(irPayload_type == type_game_special)
+            {
+//                if(irPayload_data == data_gSpecial_virus)
+//                {
+//                    //set led event
+//                    enqueue(&main_ev, setup_ev);
+//
+//                    //current_stage = GoL_Zombie;
+//                    run_stage = Stage_GoL_Zombie;
+//                }
+            }
+
             break;
+        }
+        case(irResp_ev):
+        {
+            response_delay++;
+            if(response_delay > backoff_time)
+            {
+                response_delay = 0;
+                ir_resp(send_data);
+            }
+            else
+                enqueue(&main_ev, irResp_ev);
+
+            break;
+        }
+      }
+
+
+    if(delay_count > iterator_count)
+        green_leds = 0x00;
+    else
+    {
+        green_leds = 0b10111101;
+    }
+
+        delay_count++;
+
+        if(delay_count > (2000))
+        {
+            check_accel();
+            
+            delay_count = 0;
+        }
+    
+    set_leds(green_leds);
+}
+
+void Stage_GoL_Purgatory()
+{
+    switch(get_next(&main_ev))
+    {
+        case(empty_ev):
+        {
+            break;
+        }
+        case(setup_ev):
+        {
+            response_delay = 0; //reset IR backoff timer
+            irPayload_type = 0xFF;
+            iterator_count = 1000;
+            delay_count = 0;
+            seq = 0;
+            green_leds = 0x00;
+
+            if(next_life == zombie_life)
+            {
+                led_seq = led_seq_mutate;
+                enqueue(&main_ev, led_ev);
+            }
+            else
+            {
+                led_seq = led_seq_death;
+                enqueue(&main_ev, led_ev);
+            }
+            break;
+        }
+        case(tilt_ev):
+        {
+            check_tilt();
+            break;
+        }
+        case(shake_ev):
+        {
+            break;
+        }
+        case(tap_ev):
+        {
+            break;
+        }
+        case(button_ev):
+        {
+            break;
+        }
+        case(led_ev):
+        {
+            led_seq();
+            return;
         }
         case(irRec_ev):
         {
@@ -1035,7 +1194,46 @@ void Stage_GoL_Zombie()
 
             break;
         }
-      }
+    }
+
+
+    if(!delay_count)
+    {
+        if(next_life == zombie_life)
+        {
+            green_leds >>= 1;
+            green_leds |= 0x80;
+            irCB_GoLRally(250);
+        }
+        else
+        {
+            green_leds <<= 1;
+            green_leds |= 0x01;
+            irCB_GoLFood(20);
+        }
+        delay_count++;
+    }
+    else
+    {
+        delay_count++;
+
+        if(delay_count > 8300)
+            delay_count = 0;
+
+        if(green_leds == 0xff)
+        {
+            //set led event
+            enqueue(&main_ev, setup_ev);
+
+            if(next_life == zombie_life)
+                //current_stage = GoL_Zombie;
+                run_stage = Stage_GoL_Zombie;
+            else
+                run_stage = Stage_GoL_Living;
+        }
+    }
+
+    set_leds(green_leds);
 }
 
 ///////////////////
@@ -1090,7 +1288,7 @@ void led_seq_Loading(void)
                 timer1Value = freq[15];
                 timer1Counts = TIMER1HZ / (timer1Value << 2);
                 PIE1bits.TMR1IE = 1;
-
+                T1CONbits.TMR1ON = 1;
             }
             else
             {
@@ -1099,6 +1297,7 @@ void led_seq_Loading(void)
                 timer1Value = freq[25];
                 timer1Counts = TIMER1HZ / (timer1Value << 2);
                 PIE1bits.TMR1IE = 1;
+                T1CONbits.TMR1ON = 1;
             }
 
             i += 5;
@@ -1560,7 +1759,7 @@ void led_seq_mutate(void)
 
     unsigned char led = 0x00;
 
-    if(i < 8 )
+    if(i < 14 )
     {
         count_tens += 1;
 
@@ -1578,13 +1777,13 @@ void led_seq_mutate(void)
             i++;
 
             //loading noise!
-            timer1Value = freq[55 - i];
+            timer1Value = freq[15 - i + (j<<2)];
             timer1Counts = TIMER1HZ / (timer1Value << 2);
             PIE1bits.TMR1IE = 1;
             T1CONbits.TMR1ON = 1;
         }
     }
-    else if ( j < 3)
+    else if ( j < 14)
     {
         //i = 0;
         j++;

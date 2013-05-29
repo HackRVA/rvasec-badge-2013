@@ -34,6 +34,9 @@
 #define data_gSpecial_peerCountReq 0x02
 #define data_gSpecial_virus 0x03
 
+#define zombie_life 0x01
+#define reg_life 0x02
+
 //special LED sequences for the led_ev
 typedef enum LED_mode {startup, 
                         cylon,
@@ -51,7 +54,9 @@ typedef enum Event {empty_ev,
                     irRec_ev,
                     pingResp_ev,
                     irResp_ev,
-                    setup_ev};
+                    setup_ev,
+                    death_ev,
+                    z_death_ev};
 
 //game stages
 typedef enum Stage {welcome, 
@@ -87,6 +92,9 @@ void irCB_pingReq( unsigned char data);
 
 void irCB_GoLFood(unsigned char amount);
 void irCB_GoLAttack(unsigned char amount);
-
+void irCB_GoLTrade(unsigned char amount);
+void irCB_GoLMutate();
+void irCB_GoLRally(unsigned char amount);
+void irCB_GoL_Z_Attack(unsigned char amount);
 #endif	/* COMMON_H */
 
