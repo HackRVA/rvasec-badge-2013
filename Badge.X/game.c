@@ -70,7 +70,7 @@ volatile unsigned char tilt = 0;
 //the badge id, you might say this is important
 //should be stored in flash, but for now this will do
 #define standard_backoff 300
-unsigned char badge_id = 0; //min is 55
+unsigned char badge_id = 42; //min is 55
 unsigned short slotted_backoff;// = base_backoff + badge_id;
 unsigned short backoff_time = 0;
 
@@ -915,7 +915,7 @@ void Stage_PeerCount()
             break;
         }
     }
-    set_leds(green_leds);
+   // set_leds(green_leds);
 }
 
 #define decay_interval 6000
