@@ -88,7 +88,7 @@ struct event_buffer sleep_ev = { empty_ev,
                                 empty_ev};
 
 //function pointers replace switch case
-void (*run_stage)(void) = Stage_Welcome; //stage running now
+void (*run_stage)(void) = Stage_GoL_PatientZeros; //stage running now
 void (*return_stage)(void);          //stage to run after idle
 void (*led_seq)(void);               //led seq to run if led_ev
 void (*ir_resp)(unsigned char data); //ir method to run if irResp_ev
@@ -331,7 +331,12 @@ void Stage_Mimicry()
         }
         case(tap_ev):
         {
-            //was the tap at the right time?
+ 
+            break;
+        }
+        case(button_ev):
+        {
+           //was the tap at the right time?
             if((green_leds & blink_loc))
             {
                 //did they win the round?
@@ -341,15 +346,15 @@ void Stage_Mimicry()
                     if(speed == 600)
                     {
                         //current_stage = balance;
-                        run_stage = Stage_Balance;
+                        run_stage = Stage_PeerCount;
                         green_leds = 0x00;
                         set_leds(0x00);
 
                         //set led event
-                        enqueue(&main_ev, led_ev);
+                        //enqueue(&main_ev, led_ev);
 
                         led_seq = led_seq_stageWin;
-                        
+
                         enqueue(&main_ev, setup_ev);
                     }
                     else
@@ -358,19 +363,18 @@ void Stage_Mimicry()
                         set_leds(0x00);
                         green_leds = 0x00;
                         blink_loc = 0x80;
-                        
 
                         //set led event
                         enqueue(&main_ev, led_ev);
 
                         led_seq = led_seq_sectionWin;
-                    }    
+                    }
                 }
                 else
                 {
                     //move blinking led up
                     blink_loc =  blink_loc >> 1;
-                    green_leds = (green_leds >> 1) | (blink_loc | 0x80); 
+                    green_leds = (green_leds >> 1) | (blink_loc | 0x80);
                 }
             }
             else//MISSED!
@@ -381,11 +385,6 @@ void Stage_Mimicry()
                     green_leds = (green_leds << 1);
                 }
             }
-            break;
-        }
-        case(button_ev):
-        {
-
             break;
         }
         case(led_ev):
@@ -809,18 +808,12 @@ void Stage_PeerCount()
         }
         case(tilt_ev):
         {
+            set_leds(green_leds);
             check_tilt();
             break;
         }
         case(shake_ev):
         {
-            //add led event
-            enqueue(&main_ev, led_ev);
-
-            led_seq = led_seq_sonar;
-            
-            irCB_gSpecialReq();
-
             break;
         }
         case(tap_ev):
@@ -829,6 +822,12 @@ void Stage_PeerCount()
         }
         case(button_ev):
         {
+            //add led event
+            enqueue(&main_ev, led_ev);
+
+            led_seq = led_seq_sonar;
+
+            irCB_gSpecialReq();
             break;
         }
         case(led_ev):
@@ -911,7 +910,6 @@ void Stage_PeerCount()
             break;
         }
     }
-    set_leds(green_leds);
 }
 
 #define decay_interval 6000
@@ -1325,6 +1323,179 @@ void Stage_GoL_Purgatory()
     }
 
     set_leds(green_leds);
+}
+
+void Stage_GoL_Medic()
+{
+    switch(get_next(&main_ev))
+    {
+        case(empty_ev):
+        {
+            break;
+        }
+        case(setup_ev):
+        {
+            response_delay = 0; //reset IR backoff timer
+            irPayload_type = 0xFF;
+            delay_count = 1;
+            led_seq = led_seq_null;
+            //enqueue(&main_ev, led_ev);
+
+            //max health is 250 (start with a level badge for max health ;P)
+            hp = 0xC3;//(hp_seed % (xA ^ yA)) + hp_seed;
+            set_leds(0x00);
+            break;
+        }
+        case(tilt_ev):
+        {
+            check_tilt();
+            break;
+        }
+
+        case(tap_ev):
+        {
+            break;
+        }
+        case(button_ev):
+        {
+            irCB_GoLFood(0x0F);
+            timer1Value = freq[15];
+            timer1Counts = TIMER1HZ / (timer1Value << 2);
+            PIE1bits.TMR1IE = 1;
+            T1CONbits.TMR1ON = 1;
+            break;
+        }
+        case(led_ev):
+        {
+            led_seq();
+            //break;
+            return;
+        }
+        case(irRec_ev):
+        {
+            break;
+        }
+        case(irResp_ev):
+        {
+            response_delay++;
+            if(response_delay > backoff_time)
+            {
+                response_delay = 0;
+                ir_resp(send_data);
+            }
+            else
+                enqueue(&main_ev, irResp_ev);
+
+            break;
+        }
+    }
+
+    //is it decaying?
+    if(delay_count)
+    {
+        delay_count++;
+        if(delay_count > decay_interval)
+        {
+            delay_count = 1;
+            hp ^= 0xc3;
+            set_leds(hp);
+//            if(!hp)
+//            {
+//                run_stage = Stage_GoL_Purgatory;
+//                //led_seq = led_seq_death;
+//                enqueue(&main_ev, setup_ev);
+//                next_life = reg_life;
+//            }
+//            else if(hp < 15)
+//            {
+//                timer1Value = freq[50 - hp];
+//                timer1Counts = TIMER1HZ / (timer1Value << 2);
+//                PIE1bits.TMR1IE = 1;
+//                T1CONbits.TMR1ON = 1;
+//            }
+        }
+    }
+}
+
+void Stage_GoL_PatientZeros()
+{
+    switch(get_next(&main_ev))
+    {
+        case(empty_ev):
+        {
+            break;
+        }
+        case(setup_ev):
+        {
+            response_delay = 0; //reset IR backoff timer
+            irPayload_type = 0xFF;
+            delay_count = 1;
+            led_seq = led_seq_null;
+            //enqueue(&main_ev, led_ev);
+
+            //max health is 250 (start with a level badge for max health ;P)
+            hp = 0x80;//(hp_seed % (xA ^ yA)) + hp_seed;
+            set_leds(0x00);
+            break;
+        }
+        case(tilt_ev):
+        {
+            check_tilt();
+            break;
+        }
+
+        case(tap_ev):
+        {
+            break;
+        }
+        case(button_ev):
+        {
+            irCB_GoLMutate(0x0F);
+            timer1Value = freq[47];
+            timer1Counts = TIMER1HZ / (timer1Value << 2);
+            PIE1bits.TMR1IE = 1;
+            T1CONbits.TMR1ON = 1;
+            break;
+        }
+        case(led_ev):
+        {
+            led_seq();
+            //break;
+            return;
+        }
+        case(irRec_ev):
+        {
+            break;
+        }
+        case(irResp_ev):
+        {
+            response_delay++;
+            if(response_delay > backoff_time)
+            {
+                response_delay = 0;
+                ir_resp(send_data);
+            }
+            else
+                enqueue(&main_ev, irResp_ev);
+
+            break;
+        }
+    }
+
+    //is it decaying?
+    if(delay_count)
+    {
+        delay_count++;
+        if(delay_count > decay_interval)
+        {
+            delay_count = 1;
+            
+            if(!hp)
+                hp = 0x80;
+            set_leds(hp);
+            hp >>= 1;
+        }
+    }
 }
 
 ///////////////////

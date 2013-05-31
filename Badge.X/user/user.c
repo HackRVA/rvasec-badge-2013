@@ -26,7 +26,7 @@
 #define IR_BIT_LENGTH_DIV4   ((IR_BIT_LENGTH / 4) - 0/2)
 
 //#define DEV
-#define accel_on
+//#define accel_on
 #define base_station
 
 /** globals for IR lib functions ********************************************************/

@@ -45,6 +45,11 @@ void Stage_PeerCount();
 void Stage_GoL_Living();
 void Stage_GoL_Zombie();
 
+void Stage_GoL_Living();
+
+void Stage_GoL_Medic();
+void Stage_GoL_PatientZeros();
+
 void Stage_GoL_Purgatory();
 
 /////////////////////
