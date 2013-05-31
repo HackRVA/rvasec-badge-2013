@@ -278,6 +278,7 @@ void Stage_Welcome()
         }
         case(button_ev):
         {
+            read_set_stage();
             break;
         }
         case(led_ev):
@@ -385,7 +386,7 @@ void Stage_Mimicry()
         }
         case(button_ev):
         {
-
+            store_stage(0x00);
             break;
         }
         case(led_ev):
@@ -445,7 +446,7 @@ void Stage_Balance()
             irPayload_type = 0xFF;
             accel_standby();
             blink_loc = 0x40;
-
+            store_stage(0x01);
             break;
         }
         case(tilt_ev):
@@ -605,6 +606,7 @@ void Stage_Fib()
             irPayload_type = 0xFF;
             i2c_setup();
             green_leds = 0x00;
+            store_stage(0x02);
             break;
         }
         case(tilt_ev):
@@ -746,6 +748,7 @@ void Stage_CylonSeek()
         }
         case(button_ev):
         {
+            store_stage(0x03);
             break;
         }
         case(led_ev):
@@ -805,6 +808,7 @@ void Stage_PeerCount()
             irPayload_type = 0xFF;
             led_seq = led_seq_sonar;
             enqueue(&main_ev, led_ev);
+            store_stage(0x04);
             break;
         }
         case(tilt_ev):
@@ -936,6 +940,7 @@ void Stage_GoL_Living()
             //max health is 250 (start with a level badge for max health ;P)
             hp = 5;//(hp_seed % (xA ^ yA)) + hp_seed;
             set_leds(0x00);
+            store_stage(0x05);
             break;
         }
         case(tilt_ev):
@@ -1118,6 +1123,7 @@ void Stage_GoL_Zombie()
             green_leds = 0b10111101;
             led_seq = led_seq_mutate;
             enqueue(&main_ev, led_ev);
+            store_stage(0x06);
             break;
         }
         case(tilt_ev):
@@ -2308,4 +2314,84 @@ unsigned char check_peers(unsigned char id)
     }
 
     return 0x00;
+}
+
+void store_stage(unsigned char stage)
+{
+    extern unsigned char EEbyte, EEaddr;
+    extern void EEfetch(void);
+    extern void EEstore(void);
+
+
+    EEbyte = stage;
+
+    EEaddr = 0; // read address 32
+    EEstore();
+}
+
+unsigned char read_stage()
+{
+    extern void EEfetch(void);
+    extern void EEstore(void);
+    extern unsigned char EEbyte, EEaddr;
+
+    EEbyte = 0;
+
+    EEaddr = 0; // read address 32
+    EEfetch();
+    return EEbyte;
+}
+
+void read_set_stage()
+{
+    switch(read_stage())
+    {
+        case(0x00):
+        {
+            //current_stage = balance;
+            run_stage = Stage_Mimicry;
+            break;
+        }
+
+        case(0x01):
+        {
+            run_stage = Stage_Balance;
+            break;
+        }
+
+        case(0x02):
+        {
+            run_stage = Stage_Fib;
+            break;
+        }
+
+        case(0x03):
+        {
+            run_stage = Stage_CylonSeek;
+            break;
+        }
+
+        case(0x04):
+        {
+            run_stage = Stage_PeerCount;
+            break;
+        }
+
+        case(0x05):
+        {
+            run_stage = Stage_GoL_Living;
+            break;
+        }
+
+        case(0x06):
+        {
+            run_stage = Stage_GoL_Zombie;
+            break;
+        }
+    }
+    green_leds = 0x00;
+    set_leds(0x00);
+
+    enqueue(&main_ev, setup_ev);
+    led_seq = led_seq_null;
 }

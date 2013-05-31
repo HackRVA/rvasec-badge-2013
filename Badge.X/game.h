@@ -87,4 +87,7 @@ void led_seq_Cylon_NoSound(void);
 void enqueue_peer(unsigned char id);
 unsigned char check_peers(unsigned char id);
 
+void store_stage(unsigned char id);
+unsigned char read_stage();
+void read_set_stage();
 #endif	/* GAME_H */
