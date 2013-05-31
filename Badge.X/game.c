@@ -23,7 +23,7 @@
 #define IR_SILENT       3
 
 //base value for IR back off delay
-#define base_backoff 55
+#define base_backoff 75
 
 extern void SendRC5(void);
 extern volatile unsigned char IRstate;
@@ -70,7 +70,7 @@ volatile unsigned char tilt = 0;
 //the badge id, you might say this is important
 //should be stored in flash, but for now this will do
 #define standard_backoff 300
-unsigned char badge_id = 35; //min is 55
+unsigned char badge_id = 0; //min is 55
 unsigned short slotted_backoff;// = base_backoff + badge_id;
 unsigned short backoff_time = 0;
 
@@ -339,7 +339,7 @@ void Stage_Mimicry()
                 if(blink_loc == 0x01)
                 {
                     //round complete if they made it to the top speed
-                    if(speed == 600)
+                    if(speed == 800)
                     {
                         //current_stage = balance;
                         run_stage = Stage_Balance;
@@ -791,7 +791,7 @@ void Stage_CylonSeek()
 }
 
 //amount needed to get OVER in order to win
-#define peer_count_goal 5
+#define peer_count_goal 75
 void Stage_PeerCount()
 {
     static unsigned char peer_count = 0x00;
@@ -938,7 +938,7 @@ void Stage_GoL_Living()
             //enqueue(&main_ev, led_ev);
 
             //max health is 250 (start with a level badge for max health ;P)
-            hp = 5;//(hp_seed % (xA ^ yA)) + hp_seed;
+            hp = 50;//(hp_seed % (xA ^ yA)) + hp_seed;
             set_leds(0x00);
             store_stage(0x05);
             break;
@@ -956,7 +956,7 @@ void Stage_GoL_Living()
             timer1Counts = TIMER1HZ / (timer1Value << 2);
             PIE1bits.TMR1IE = 1;
             T1CONbits.TMR1ON = 1;
-            //hp -= 0x0A;
+            hp -= 0x02;
             break;
         }
         case(tap_ev):
@@ -1133,6 +1133,11 @@ void Stage_GoL_Zombie()
         }
         case(shake_ev):
         {
+            irCB_GoLRally(200);
+            timer1Value = freq[15];
+            timer1Counts = TIMER1HZ / (timer1Value << 2);
+            PIE1bits.TMR1IE = 1;
+            T1CONbits.TMR1ON = 1;
             break;
         }
         case(tap_ev):
@@ -1141,6 +1146,11 @@ void Stage_GoL_Zombie()
         }
         case(button_ev):
         {
+            irCB_GoL_Z_Attack(0x0A);
+            timer1Value = freq[15];
+            timer1Counts = TIMER1HZ / (timer1Value << 2);
+            PIE1bits.TMR1IE = 1;
+            T1CONbits.TMR1ON = 1;
             break;
         }
         case(led_ev):
@@ -1167,12 +1177,15 @@ void Stage_GoL_Zombie()
             }
             else if(irPayload_type == type_GoL_Z_rally)
             {
-                //set led event
-                enqueue(&main_ev, led_ev);
+                if(iteratorCount > 400)
+                {
+                    iteratorCount -= irPayload_data;
+                    
+                    //set led event
+                    enqueue(&main_ev, led_ev);
 
-                led_seq = led_seq_sectionWin;
-
-                iteratorCount -= irPayload_data;
+                    led_seq = led_seq_sectionWin;
+                }
             }
             else if(irPayload_type == type_game_special)
             {

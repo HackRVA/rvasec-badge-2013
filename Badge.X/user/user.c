@@ -27,7 +27,7 @@
 
 //#define DEV
 #define accel_on
-#define base_station
+//#define base_station
 
 /** globals for IR lib functions ********************************************************/
 extern void SendRC5(void);
@@ -734,8 +734,8 @@ void ProcessIO(void)
         {
             irCB_pingResp(badge_id);
         }
-        else
-            irCB_gSpecialResp(badge_id);
+//        else
+//            irCB_gSpecialResp(badge_id);
     }
 
     // checkCount should only be incremented once per loop
@@ -1340,10 +1340,10 @@ void led_seq_Cylon_NoSound(void)
             else if(delayCount < 40)
                 set_leds((third_seq_up << j) >> 4);
 
-            timer1Value = freq[7];
-            timer1Counts = TIMER1HZ / (4096 << 2);
-            PIE1bits.TMR1IE = 1;
-            T1CONbits.TMR1ON = 1;
+//            timer1Value = freq[7];
+//            timer1Counts = TIMER1HZ / (4096 << 2);
+//            PIE1bits.TMR1IE = 1;
+//            T1CONbits.TMR1ON = 1;
         }
         else
         {
@@ -1356,10 +1356,10 @@ void led_seq_Cylon_NoSound(void)
             else if(delayCount < 40)
                 set_leds(third_seq_up << (j-4) );
 
-            timer1Value = freq[9];
-            timer1Counts = TIMER1HZ / (4096 << 2);
-            PIE1bits.TMR1IE = 1;
-            T1CONbits.TMR1ON = 1;
+//            timer1Value = freq[9];
+//            timer1Counts = TIMER1HZ / (4096 << 2);
+//            PIE1bits.TMR1IE = 1;
+//            T1CONbits.TMR1ON = 1;
         }
 
         delayCount++;
@@ -1391,10 +1391,10 @@ void led_seq_Cylon_NoSound(void)
             else if(delayCount < 40)
                 set_leds((third_seq_down >> j - 12) << 4);
 
-            timer1Value = freq[7];
-            timer1Counts = TIMER1HZ / (4096 << 2);
-            PIE1bits.TMR1IE = 1;
-            T1CONbits.TMR1ON = 1;
+//            timer1Value = freq[7];
+//            timer1Counts = TIMER1HZ / (4096 << 2);
+//            PIE1bits.TMR1IE = 1;
+//            T1CONbits.TMR1ON = 1;
         }
         else
         {
@@ -1409,10 +1409,10 @@ void led_seq_Cylon_NoSound(void)
              else if(delayCount < 40)
                 set_leds( third_seq_down >> j - 16);
 
-            timer1Value = freq[9];
-            timer1Counts = TIMER1HZ / (4096 << 2);
-            PIE1bits.TMR1IE = 1;
-            T1CONbits.TMR1ON = 1;
+//            timer1Value = freq[9];
+//            timer1Counts = TIMER1HZ / (4096 << 2);
+//            PIE1bits.TMR1IE = 1;
+//            T1CONbits.TMR1ON = 1;
         }
 
 
