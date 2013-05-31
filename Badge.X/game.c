@@ -496,7 +496,7 @@ void Stage_Balance()
         check_accel();
         delay_count++;
 
-       if(yA < -2)
+       if(xA > 2)//(xA < -2)
        {
            if(temp_leds == 0x00)
                temp_leds = 0x28;
@@ -504,7 +504,7 @@ void Stage_Balance()
            if(temp_leds != 0xA0)
                temp_leds <<= 1;
        }
-       else if (yA > 2)
+       else if (xA < -2)//(xA > 2)
        {
             if(temp_leds == 0x00)
                temp_leds = 0x14;
