@@ -70,7 +70,7 @@ volatile unsigned char tilt = 0;
 //the badge id, you might say this is important
 //should be stored in flash, but for now this will do
 #define standard_backoff 300
-unsigned char badge_id = 35; //min is 55
+unsigned char badge_id = 36; //min is 55
 unsigned short slotted_backoff;// = base_backoff + badge_id;
 unsigned short backoff_time = 0;
 
@@ -88,7 +88,7 @@ struct event_buffer sleep_ev = { empty_ev,
                                 empty_ev};
 
 //function pointers replace switch case
-void (*run_stage)(void) = Stage_GoL_PatientZeros; //stage running now
+void (*run_stage)(void) = Stage_Welcome; //stage running now
 void (*return_stage)(void);          //stage to run after idle
 void (*led_seq)(void);               //led seq to run if led_ev
 void (*ir_resp)(unsigned char data); //ir method to run if irResp_ev
@@ -278,6 +278,34 @@ void Stage_Welcome()
         }
         case(button_ev):
         {
+            if(!(unsigned int)badge_id % 2)
+            {
+                //current_stage = balance;
+                run_stage = Stage_GoL_Medic;
+                green_leds = 0x00;
+                set_leds(0x00);
+
+                //set led event
+                //enqueue(&main_ev, led_ev);
+
+                led_seq = led_seq_stageWin;
+
+                enqueue(&main_ev, setup_ev);
+            }
+            else
+            {
+                //current_stage = balance;
+                run_stage = Stage_GoL_PatientZeros;
+                green_leds = 0x00;
+                set_leds(0x00);
+
+                //set led event
+                //enqueue(&main_ev, led_ev);
+
+                led_seq = led_seq_stageWin;
+
+                enqueue(&main_ev, setup_ev);
+            }
             break;
         }
         case(led_ev):

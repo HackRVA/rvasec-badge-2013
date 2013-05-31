@@ -35,7 +35,7 @@ extern volatile byte DataByte, AddrByte, ToggByte;
 unsigned char usbOn;
 extern volatile unsigned char int_tilt_count;
 extern struct event_buffer main_ev;
-extern unsigned char badge_id;
+static unsigned char badge_id;
 unsigned char do_led_seq = 0x00;
 
 // global ram variables
