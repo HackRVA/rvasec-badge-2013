@@ -88,7 +88,7 @@ struct event_buffer sleep_ev = { empty_ev,
                                 empty_ev};
 
 //function pointers replace switch case
-void (*run_stage)(void) = Stage_Welcome; //stage running now
+void (*run_stage)(void) = Stage_GoL_Living; //stage running now
 void (*return_stage)(void);          //stage to run after idle
 void (*led_seq)(void);               //led seq to run if led_ev
 void (*ir_resp)(unsigned char data); //ir method to run if irResp_ev
@@ -374,7 +374,7 @@ void Stage_Mimicry()
                     if(speed == 600)
                     {
                         //current_stage = balance;
-                        run_stage = Stage_PeerCount;
+                        run_stage = Stage_CylonSeek;
                         green_leds = 0x00;
                         set_leds(0x00);
 
@@ -760,11 +760,6 @@ void Stage_CylonSeek()
         }
         case(shake_ev):
         {
-            //set led event
-            enqueue(&main_ev, led_ev);
-
-            led_seq = led_seq_Cylon;
-
             break;
         }
         case(tap_ev):
@@ -773,6 +768,10 @@ void Stage_CylonSeek()
         }
         case(button_ev):
         {
+            //set led event
+            enqueue(&main_ev, led_ev);
+
+            led_seq = led_seq_Cylon;
             break;
         }
         case(led_ev):
@@ -815,7 +814,7 @@ void Stage_CylonSeek()
 }
 
 //amount needed to get OVER in order to win
-#define peer_count_goal 5
+#define peer_count_goal 15
 void Stage_PeerCount()
 {
     static unsigned char peer_count = 0x00;
@@ -942,7 +941,7 @@ void Stage_PeerCount()
 
 #define decay_interval 6000
 #define decay_amount 0x01
-#define hp_seed 30
+#define hp_seed 100
 void Stage_GoL_Living()
 {
     switch(get_next(&main_ev))
@@ -956,11 +955,11 @@ void Stage_GoL_Living()
             response_delay = 0; //reset IR backoff timer
             irPayload_type = 0xFF;
             delay_count = 1;
-            led_seq = led_seq_null;
+            led_seq = led_seq_sectionWin;
             //enqueue(&main_ev, led_ev);
 
             //max health is 250 (start with a level badge for max health ;P)
-            hp = 5;//(hp_seed % (xA ^ yA)) + hp_seed;
+            hp = hp_seed;//(hp_seed % (xA ^ yA)) + hp_seed;
             set_leds(0x00);
             break;
         }
@@ -972,7 +971,8 @@ void Stage_GoL_Living()
         case(shake_ev):
         {
             //attack (needs to be changed to button event)
-            irCB_GoLTrade(0x02);
+            irCB_GoLTrade(0x05);
+            hp -= 5;
             timer1Value = freq[25];
             timer1Counts = TIMER1HZ / (timer1Value << 2);
             PIE1bits.TMR1IE = 1;
@@ -987,6 +987,7 @@ void Stage_GoL_Living()
         case(button_ev):
         {
             irCB_GoLAttack(0x0A);
+            hp -= 5;
             timer1Value = freq[15];
             timer1Counts = TIMER1HZ / (timer1Value << 2);
             PIE1bits.TMR1IE = 1;
@@ -1161,6 +1162,14 @@ void Stage_GoL_Zombie()
         }
         case(button_ev):
         {
+            irCB_GoL_Z_Attack(10);
+            timer1Value = freq[45];
+            timer1Counts = TIMER1HZ / (timer1Value << 2);
+            PIE1bits.TMR1IE = 1;
+            T1CONbits.TMR1ON = 1;
+
+            if(iteratorCount<1800)
+                 iteratorCount += 100;
             break;
         }
         case(led_ev):
@@ -1192,18 +1201,24 @@ void Stage_GoL_Zombie()
 
                 led_seq = led_seq_sectionWin;
 
-                iteratorCount -= irPayload_data;
+                if(iteratorCount > 400)
+                    iteratorCount -= irPayload_data;
             }
             else if(irPayload_type == type_game_special)
             {
-//                if(irPayload_data == data_gSpecial_virus)
-//                {
-//                    //set led event
-//                    enqueue(&main_ev, setup_ev);
-//
-//                    //current_stage = GoL_Zombie;
-//                    run_stage = Stage_GoL_Zombie;
-//                }
+                if(irPayload_data == data_gSpecial_cure)
+                {
+                    //setup event
+                    enqueue(&main_ev, setup_ev);
+
+                    //current_stage = GoL_Zombie;
+                    run_stage = Stage_GoL_Living;
+
+                    led_seq = led_seq_stageWin;
+
+                    //setup event
+                    enqueue(&main_ev, led_ev);
+                }
             }
 
             break;
@@ -1231,14 +1246,14 @@ void Stage_GoL_Zombie()
         green_leds = 0b10111101;
     }
 
-        delay_count++;
+    delay_count++;
 
-        if(delay_count > (2000))
-        {
-            check_accel();
-            
-            delay_count = 0;
-        }
+    if(delay_count > (2000))
+    {
+        //check_accel();
+
+        delay_count = 0;
+    }
     
     set_leds(green_leds);
 }

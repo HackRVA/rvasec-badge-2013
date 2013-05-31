@@ -25,7 +25,7 @@
 #define IR_BIT_LENGTH_DIV2   ((IR_BIT_LENGTH / 2) - 0)
 #define IR_BIT_LENGTH_DIV4   ((IR_BIT_LENGTH / 4) - 0/2)
 
-//#define DEV
+#define DEV
 //#define accel_on
 #define base_station
 
@@ -1115,6 +1115,9 @@ void doUSBInput() {
         {
             irCB_GoL_Z_Attack(10);
         }
+
+        if(input_buffer[0] == 'u')
+            irCB_GoLCure();
     }
     else if(inputMode == 0x00)
     {

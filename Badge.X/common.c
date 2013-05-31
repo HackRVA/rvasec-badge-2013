@@ -132,6 +132,19 @@ void irCB_GoLMutate()
     SendRC5();
 }
 
+void irCB_GoLCure()
+{
+    ToggByte = (0b00100000 & data_gSpecial_cure) >> 5;
+    AddrByte = (0b00011111 & data_gSpecial_cure);
+
+    DataByte = type_game_special << 2;
+
+    //put the top two bits of the data at the 2 LSBs
+    DataByte |= (0b11000000 & data_gSpecial_cure)>>6;
+
+    SendRC5();
+}
+
 void irCB_GoLRally(unsigned char amount)
 {
     ToggByte = (0b00100000 & amount) >> 5;
