@@ -82,6 +82,9 @@ void extractPayload(unsigned char *raw,
 
 unsigned char unManchester(unsigned char *IRbits, unsigned char *outBits);
 
+void led_seq_Cylon_NoSound(void);
 
+void enqueue_peer(unsigned char id);
+unsigned char check_peers(unsigned char id);
 
 #endif	/* GAME_H */

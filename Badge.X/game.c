@@ -69,8 +69,10 @@ volatile unsigned char tilt = 0;
 
 //the badge id, you might say this is important
 //should be stored in flash, but for now this will do
-unsigned char badge_id = 10; //min is 55
-unsigned short backoff_time;// = base_backoff + badge_id;
+#define standard_backoff 300
+unsigned char badge_id = 35; //min is 55
+unsigned short slotted_backoff;// = base_backoff + badge_id;
+unsigned short backoff_time = 0;
 
 //keep track of game stage, start in welcome stage
 enum Stage current_stage = welcome;
@@ -86,7 +88,7 @@ struct event_buffer sleep_ev = { empty_ev,
                                 empty_ev};
 
 //function pointers replace switch case
-void (*run_stage)(void) = Stage_GoL_Living; //stage running now
+void (*run_stage)(void) = Stage_Welcome; //stage running now
 void (*return_stage)(void);          //stage to run after idle
 void (*led_seq)(void);               //led seq to run if led_ev
 void (*ir_resp)(unsigned char data); //ir method to run if irResp_ev
@@ -95,7 +97,7 @@ void (*ir_resp)(unsigned char data); //ir method to run if irResp_ev
 unsigned short response_delay = 0;
 unsigned short IR_backoff = 500;
 unsigned short delay_count = 0;
-unsigned short iterator_count = 0;
+unsigned short iteratorCount = 0;
 unsigned short speed = 0;
 unsigned char blink_loc = 0x80;
 unsigned char seq = 0;
@@ -103,6 +105,9 @@ unsigned char hp = 20;
 unsigned char errBits = 0x00;
 unsigned char send_data = 0x00;
 unsigned char next_life = reg_life;
+unsigned short btn_debounce = 1;
+
+unsigned char peers_met[10] = {0,0,0,0,0,0,0,0,0,0};
 
 #pragma code
 void Init_Game()
@@ -118,13 +123,11 @@ void Init_Game()
     //run stages setup first
     enqueue(&main_ev, setup_ev);
 
-
-
     if(badge_id)
         //set backoff time based on badge id
-        backoff_time = base_backoff + (unsigned short)badge_id * 20 ;
+        slotted_backoff = base_backoff + (unsigned short)badge_id * 20 ;
     else
-         backoff_time = base_backoff;
+         slotted_backoff = base_backoff;
     //backoff_time = badge_id;
 }
 
@@ -159,12 +162,24 @@ void Run_Game()
 
                 //reset backoff counter
                 response_delay = 0;
+
+                //need to slot ping responses
+                backoff_time = slotted_backoff;
             }
             else //otherwise, the stage handles it (not a ping)
                 enqueue(&main_ev, irRec_ev);
         }
         IRstate = IR_LISTENING;
     }
+
+    if(PORTCbits.RC2 == 0)
+    {
+        btn_debounce++;
+        if(btn_debounce == 200)
+            enqueue(&main_ev, button_ev);
+    }
+    else
+        btn_debounce = 0x01;
 }
 
 ///////////////////
@@ -218,7 +233,7 @@ void Stage_Idle()
         case(irResp_ev):
         {
             response_delay++;
-            if(response_delay > backoff_time)
+            if(response_delay > slotted_backoff)
             {
                 response_delay = 0;
                 ir_resp(send_data);
@@ -370,6 +385,7 @@ void Stage_Mimicry()
         }
         case(button_ev):
         {
+
             break;
         }
         case(led_ev):
@@ -545,6 +561,7 @@ void Stage_Balance()
 
 void Stage_Fib()
 {
+    static unsigned char found = 0x00;
     //do we need to display the sequence?
     if(seq)
     {
@@ -555,7 +572,7 @@ void Stage_Fib()
             seq++;
             delay_count++;
 
-            if(seq > 14)
+            if(seq > 7)
             {
                 seq = 0;
                 set_leds(green_leds);
@@ -607,19 +624,7 @@ void Stage_Fib()
             {
                 green_leds++;
    
-                if(green_leds == 15)
-                {
-                    //show stage three?
-                    green_leds = 0;
 
-                    //current_stage = cylonSeek;
-                    run_stage = Stage_CylonSeek;
-                    
-                    //set led event
-                    enqueue(&main_ev, led_ev);
-
-                    led_seq = led_seq_stageWin;
-                }
 
                 set_leds(green_leds);
             }
@@ -627,6 +632,56 @@ void Stage_Fib()
         }
         case(button_ev):
         {
+            if(green_leds == 13)
+            {
+                found |= green_leds;
+
+                //set led event
+                enqueue(&main_ev, led_ev);
+
+                led_seq = led_seq_sectionWin;
+            }
+            else if(green_leds == 21)
+            {
+                found |= green_leds;
+
+                //set led event
+                enqueue(&main_ev, led_ev);
+
+                led_seq = led_seq_sectionWin;
+            }
+            else if(green_leds == 34)
+            {
+                found |= green_leds;
+
+                //set led event
+                enqueue(&main_ev, led_ev);
+
+                led_seq = led_seq_sectionWin;
+            }
+            else
+            {
+                green_leds = 0;
+                
+                //set led event
+                enqueue(&main_ev, led_ev);
+
+                led_seq = led_seq_hurt;
+            }
+
+            if(found == (34 | 21 | 13))
+            {
+                //show stage three?
+                green_leds = 0;
+
+                //current_stage = cylonSeek;
+                run_stage = Stage_CylonSeek;
+
+                //set led event
+                enqueue(&main_ev, led_ev);
+
+                led_seq = led_seq_stageWin;
+            }
             break;
         }
         case(led_ev):
@@ -733,7 +788,7 @@ void Stage_CylonSeek()
 }
 
 //amount needed to get OVER in order to win
-#define peer_count_goal 4
+#define peer_count_goal 5
 void Stage_PeerCount()
 {
     static unsigned char peer_count = 0x00;
@@ -787,31 +842,57 @@ void Stage_PeerCount()
             if(irPayload_type == type_game_special
                     && irPayload_data == data_gSpecial_peerCountReq)
             {
-                //set led event
-                enqueue(&main_ev, led_ev);
+                timer1Value = freq[25];
+                timer1Counts = TIMER1HZ / (timer1Value << 2);
+                PIE1bits.TMR1IE = 1;
+                T1CONbits.TMR1ON = 1;
 
-                led_seq = led_seq_sectionWin;
+                ir_resp = irCB_gSpecialResp;
+
+                send_data = badge_id;
+
+                enqueue(&main_ev, irResp_ev);
+
+                response_delay = 0;
+
+                backoff_time = standard_backoff;
             }
             //game special type and peer stage data
             else if(irPayload_type == type_game_special_resp)
             {
-                //set led event
-                enqueue(&main_ev, led_ev);
-
-                led_seq = led_seq_sectionWin;
-
-                green_leds = ++peer_count;
-
-                //move on 5 peers
-                if(peer_count > peer_count_goal)
+                if(!check_peers(irPayload_data))
                 {
+                    enqueue_peer(irPayload_data);
+
                     //set led event
                     enqueue(&main_ev, led_ev);
 
-                    led_seq = led_seq_stageWin;
+                    led_seq = led_seq_sectionWin;
 
-                    //current_stage = GoL_Living;
-                    run_stage = Stage_GoL_Living;
+                    green_leds = ++peer_count;
+
+                    //move on 5 peers
+                    if(peer_count > peer_count_goal)
+                    {
+                        //set led event
+                        enqueue(&main_ev, led_ev);
+
+                        led_seq = led_seq_stageWin;
+
+                        //current_stage = GoL_Living;
+                        run_stage = Stage_GoL_Living;
+                    }
+//                    timer1Value = freq[55];
+//                    timer1Counts = TIMER1HZ / (timer1Value << 2);
+//                    PIE1bits.TMR1IE = 1;
+//                    T1CONbits.TMR1ON = 1;
+                }
+                else
+                {
+                    timer1Value = freq[15];
+                    timer1Counts = TIMER1HZ / (timer1Value << 2);
+                    PIE1bits.TMR1IE = 1;
+                    T1CONbits.TMR1ON = 1;
                 }
             }
 
@@ -830,6 +911,7 @@ void Stage_PeerCount()
             break;
         }
     }
+    set_leds(green_leds);
 }
 
 #define decay_interval 6000
@@ -864,7 +946,12 @@ void Stage_GoL_Living()
         case(shake_ev):
         {
             //attack (needs to be changed to button event)
-            irCB_GoLTrade(0x0A);
+            irCB_GoLTrade(0x02);
+            timer1Value = freq[25];
+            timer1Counts = TIMER1HZ / (timer1Value << 2);
+            PIE1bits.TMR1IE = 1;
+            T1CONbits.TMR1ON = 1;
+            //hp -= 0x0A;
             break;
         }
         case(tap_ev):
@@ -874,6 +961,10 @@ void Stage_GoL_Living()
         case(button_ev):
         {
             irCB_GoLAttack(0x0A);
+            timer1Value = freq[15];
+            timer1Counts = TIMER1HZ / (timer1Value << 2);
+            PIE1bits.TMR1IE = 1;
+            T1CONbits.TMR1ON = 1;
             break;
         }
         case(led_ev):
@@ -939,18 +1030,18 @@ void Stage_GoL_Living()
             }
             else if(irPayload_type == type_GoL_L_hpTrade)
             {
-                //set led event
-                enqueue(&main_ev, led_ev);
-
-                led_seq = led_seq_sectionWin;
-
-                //check for overflow on health
-                if( (255 - hp)<irPayload_data)
-                    hp = 255;
-                else
-                    hp += irPayload_data;
-
-                green_leds = hp;
+//                //set led event
+//                enqueue(&main_ev, led_ev);
+//
+//                led_seq = led_seq_sectionWin;
+//
+//                //check for overflow on health
+//                if( (255 - hp)<irPayload_data)
+//                    hp = 255;
+//                else
+//                    hp += irPayload_data;
+//
+//                green_leds = hp;
             }
             else if(irPayload_type == type_game_special)
             {
@@ -1021,7 +1112,7 @@ void Stage_GoL_Zombie()
         {
             response_delay = 0; //reset IR backoff timer
             irPayload_type = 0xFF;
-            iterator_count = 1000;
+            iteratorCount = 1000;
             delay_count = 0;
             seq = 0;
             green_leds = 0b10111101;
@@ -1064,7 +1155,7 @@ void Stage_GoL_Zombie()
                 }
                 else
                 {
-                    iterator_count -= 20;
+                    iteratorCount -= 20;
                 }
                 
             }
@@ -1075,7 +1166,7 @@ void Stage_GoL_Zombie()
 
                 led_seq = led_seq_sectionWin;
 
-                iterator_count -= irPayload_data;
+                iteratorCount -= irPayload_data;
             }
             else if(irPayload_type == type_game_special)
             {
@@ -1107,7 +1198,7 @@ void Stage_GoL_Zombie()
       }
 
 
-    if(delay_count > iterator_count)
+    if(delay_count > iteratorCount)
         green_leds = 0x00;
     else
     {
@@ -1138,7 +1229,7 @@ void Stage_GoL_Purgatory()
         {
             response_delay = 0; //reset IR backoff timer
             irPayload_type = 0xFF;
-            iterator_count = 1000;
+            iteratorCount = 1000;
             delay_count = 0;
             seq = 0;
             green_leds = 0x00;
@@ -1153,6 +1244,7 @@ void Stage_GoL_Purgatory()
                 led_seq = led_seq_death;
                 enqueue(&main_ev, led_ev);
             }
+            
             break;
         }
         case(tilt_ev):
@@ -1195,7 +1287,6 @@ void Stage_GoL_Purgatory()
             break;
         }
     }
-
 
     if(!delay_count)
     {
@@ -1492,11 +1583,11 @@ void led_seq_Cylon(void)
         if(delay_count >= 40)
         {
             delay_count = 0;
-            iterator_count++;
+            iteratorCount++;
 
-            if(iterator_count > cylon_speed)
+            if(iteratorCount > cylon_speed)
             {
-                iterator_count = 0;
+                iteratorCount = 0;
                 j++;
             }
         }
@@ -1546,11 +1637,11 @@ void led_seq_Cylon(void)
         if(delay_count >= 40)
         {
             delay_count = 0;
-            iterator_count++;
+            iteratorCount++;
 
-            if(iterator_count > cylon_speed)
+            if(iteratorCount > cylon_speed)
             {
-                iterator_count = 0;
+                iteratorCount = 0;
                 j++;
             }
         }
@@ -2168,7 +2259,7 @@ void i2c_setup(void)
 void reset_globals(void)
 {
     delay_count = 0;
-    iterator_count = 0;
+    iteratorCount = 0;
 }
 
 void extractPayload(unsigned char *raw,
@@ -2190,4 +2281,31 @@ void extractPayload(unsigned char *raw,
 
     *data = (raw[1] & 0b00001100) << 4;
     *data |= (raw[0] & 0b00111111);
+}
+
+
+void enqueue_peer(unsigned char id)
+{
+    peers_met[9] = peers_met[8];
+    peers_met[8] = peers_met[7];
+    peers_met[7] = peers_met[6];
+    peers_met[6] = peers_met[5];
+    peers_met[5] = peers_met[4];
+    peers_met[4] = peers_met[3];
+    peers_met[3] = peers_met[2];
+    peers_met[2] = peers_met[1];
+    peers_met[1] = peers_met[0];
+    peers_met[0] = id;
+}
+
+unsigned char check_peers(unsigned char id)
+{
+    unsigned char i = 0;
+    for(i = 0; i < 9; i++)
+    {
+        if(peers_met[i] == id)
+            return 0xff;
+    }
+
+    return 0x00;
 }

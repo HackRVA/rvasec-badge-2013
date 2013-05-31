@@ -45,11 +45,11 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/game.o ${OBJECTDIR}/common.o ${OBJECTDIR}/user/user.o ${OBJECTDIR}/main.o ${OBJECTDIR}/RC5_lib.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/game.o.d ${OBJECTDIR}/common.o.d ${OBJECTDIR}/user/user.o.d ${OBJECTDIR}/main.o.d ${OBJECTDIR}/RC5_lib.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/game.o ${OBJECTDIR}/common.o ${OBJECTDIR}/user/user.o ${OBJECTDIR}/main.o ${OBJECTDIR}/RC5_lib.o ${OBJECTDIR}/eeprom.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/game.o.d ${OBJECTDIR}/common.o.d ${OBJECTDIR}/user/user.o.d ${OBJECTDIR}/main.o.d ${OBJECTDIR}/RC5_lib.o.d ${OBJECTDIR}/eeprom.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/game.o ${OBJECTDIR}/common.o ${OBJECTDIR}/user/user.o ${OBJECTDIR}/main.o ${OBJECTDIR}/RC5_lib.o
+OBJECTFILES=${OBJECTDIR}/game.o ${OBJECTDIR}/common.o ${OBJECTDIR}/user/user.o ${OBJECTDIR}/main.o ${OBJECTDIR}/RC5_lib.o ${OBJECTDIR}/eeprom.o
 
 
 CFLAGS=
@@ -77,9 +77,16 @@ ifeq ($(TYPE_IMAGE), DEBUG_RUN)
 ${OBJECTDIR}/RC5_lib.o: RC5_lib.asm  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR} 
 	@${RM} ${OBJECTDIR}/RC5_lib.o.d 
-	@${FIXDEPS} dummy.d -e "${OBJECTDIR}/RC5_lib.err" $(SILENT) -c ${MP_AS} $(MP_EXTRA_AS_PRE) -d__DEBUG -d__MPLAB_DEBUGGER_PICKIT2=1 -q -p$(MP_PROCESSOR_OPTION) -u  -l\"${OBJECTDIR}/RC5_lib.lst\" -e\"${OBJECTDIR}/RC5_lib.err\" $(ASM_OPTIONS)  -o\"${OBJECTDIR}/RC5_lib.o\" RC5_lib.asm 
+	@${FIXDEPS} dummy.d -e "${OBJECTDIR}/RC5_lib.err" $(SILENT) -c ${MP_AS} $(MP_EXTRA_AS_PRE) -d__DEBUG -d__MPLAB_DEBUGGER_PK3=1 -q -p$(MP_PROCESSOR_OPTION) -u  -l\"${OBJECTDIR}/RC5_lib.lst\" -e\"${OBJECTDIR}/RC5_lib.err\" $(ASM_OPTIONS)  -o\"${OBJECTDIR}/RC5_lib.o\" RC5_lib.asm 
 	@${DEP_GEN} -d ${OBJECTDIR}/RC5_lib.o 
 	@${FIXDEPS} "${OBJECTDIR}/RC5_lib.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c18 
+	
+${OBJECTDIR}/eeprom.o: eeprom.asm  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR} 
+	@${RM} ${OBJECTDIR}/eeprom.o.d 
+	@${FIXDEPS} dummy.d -e "${OBJECTDIR}/eeprom.err" $(SILENT) -c ${MP_AS} $(MP_EXTRA_AS_PRE) -d__DEBUG -d__MPLAB_DEBUGGER_PK3=1 -q -p$(MP_PROCESSOR_OPTION) -u  -l\"${OBJECTDIR}/eeprom.lst\" -e\"${OBJECTDIR}/eeprom.err\" $(ASM_OPTIONS)  -o\"${OBJECTDIR}/eeprom.o\" eeprom.asm 
+	@${DEP_GEN} -d ${OBJECTDIR}/eeprom.o 
+	@${FIXDEPS} "${OBJECTDIR}/eeprom.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c18 
 	
 else
 ${OBJECTDIR}/RC5_lib.o: RC5_lib.asm  nbproject/Makefile-${CND_CONF}.mk
@@ -89,6 +96,13 @@ ${OBJECTDIR}/RC5_lib.o: RC5_lib.asm  nbproject/Makefile-${CND_CONF}.mk
 	@${DEP_GEN} -d ${OBJECTDIR}/RC5_lib.o 
 	@${FIXDEPS} "${OBJECTDIR}/RC5_lib.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c18 
 	
+${OBJECTDIR}/eeprom.o: eeprom.asm  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR} 
+	@${RM} ${OBJECTDIR}/eeprom.o.d 
+	@${FIXDEPS} dummy.d -e "${OBJECTDIR}/eeprom.err" $(SILENT) -c ${MP_AS} $(MP_EXTRA_AS_PRE) -q -p$(MP_PROCESSOR_OPTION) -u  -l\"${OBJECTDIR}/eeprom.lst\" -e\"${OBJECTDIR}/eeprom.err\" $(ASM_OPTIONS)  -o\"${OBJECTDIR}/eeprom.o\" eeprom.asm 
+	@${DEP_GEN} -d ${OBJECTDIR}/eeprom.o 
+	@${FIXDEPS} "${OBJECTDIR}/eeprom.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c18 
+	
 endif
 
 # ------------------------------------------------------------------------------------
@@ -97,28 +111,28 @@ ifeq ($(TYPE_IMAGE), DEBUG_RUN)
 ${OBJECTDIR}/game.o: game.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR} 
 	@${RM} ${OBJECTDIR}/game.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE) -D__DEBUG -D__MPLAB_DEBUGGER_PICKIT2=1 -p$(MP_PROCESSOR_OPTION)   -I ${MP_CC_DIR}/../h  -fo ${OBJECTDIR}/game.o   game.c 
+	${MP_CC} $(MP_EXTRA_CC_PRE) -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -p$(MP_PROCESSOR_OPTION)   -I ${MP_CC_DIR}/../h  -fo ${OBJECTDIR}/game.o   game.c 
 	@${DEP_GEN} -d ${OBJECTDIR}/game.o 
 	@${FIXDEPS} "${OBJECTDIR}/game.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c18 
 	
 ${OBJECTDIR}/common.o: common.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR} 
 	@${RM} ${OBJECTDIR}/common.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE) -D__DEBUG -D__MPLAB_DEBUGGER_PICKIT2=1 -p$(MP_PROCESSOR_OPTION)   -I ${MP_CC_DIR}/../h  -fo ${OBJECTDIR}/common.o   common.c 
+	${MP_CC} $(MP_EXTRA_CC_PRE) -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -p$(MP_PROCESSOR_OPTION)   -I ${MP_CC_DIR}/../h  -fo ${OBJECTDIR}/common.o   common.c 
 	@${DEP_GEN} -d ${OBJECTDIR}/common.o 
 	@${FIXDEPS} "${OBJECTDIR}/common.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c18 
 	
 ${OBJECTDIR}/user/user.o: user/user.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/user 
 	@${RM} ${OBJECTDIR}/user/user.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE) -D__DEBUG -D__MPLAB_DEBUGGER_PICKIT2=1 -p$(MP_PROCESSOR_OPTION)   -I ${MP_CC_DIR}/../h  -fo ${OBJECTDIR}/user/user.o   user/user.c 
+	${MP_CC} $(MP_EXTRA_CC_PRE) -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -p$(MP_PROCESSOR_OPTION)   -I ${MP_CC_DIR}/../h  -fo ${OBJECTDIR}/user/user.o   user/user.c 
 	@${DEP_GEN} -d ${OBJECTDIR}/user/user.o 
 	@${FIXDEPS} "${OBJECTDIR}/user/user.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c18 
 	
 ${OBJECTDIR}/main.o: main.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR} 
 	@${RM} ${OBJECTDIR}/main.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE) -D__DEBUG -D__MPLAB_DEBUGGER_PICKIT2=1 -p$(MP_PROCESSOR_OPTION)   -I ${MP_CC_DIR}/../h  -fo ${OBJECTDIR}/main.o   main.c 
+	${MP_CC} $(MP_EXTRA_CC_PRE) -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -p$(MP_PROCESSOR_OPTION)   -I ${MP_CC_DIR}/../h  -fo ${OBJECTDIR}/main.o   main.c 
 	@${DEP_GEN} -d ${OBJECTDIR}/main.o 
 	@${FIXDEPS} "${OBJECTDIR}/main.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c18 
 	
@@ -158,7 +172,7 @@ endif
 ifeq ($(TYPE_IMAGE), DEBUG_RUN)
 dist/${CND_CONF}/${IMAGE_TYPE}/Badge.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}: ${OBJECTFILES}  nbproject/Makefile-${CND_CONF}.mk  obj/cdc.o obj/i2c_ack.o obj/i2c_clos.o obj/i2c_dtrd.o obj/i2c_eeap.o obj/i2c_eebw.o obj/i2c_eecr.o obj/i2c_eepw.o obj/i2c_eerr.o obj/i2c_eesr.o obj/i2c_gets.o obj/i2c_idle.o obj/i2c_nack.o obj/i2c_open.o obj/i2c_puts.o obj/i2c_read.o obj/i2c_rstr.o obj/i2c_stop.o obj/i2c_strt.o obj/i2c_writ.o obj/usb9.o obj/usbctrltrf.o obj/usbdrv.o obj/usbdsc.o obj/usbmmap.o  18f2455_g.lkr
 	@${MKDIR} dist/${CND_CONF}/${IMAGE_TYPE} 
-	${MP_LD} $(MP_EXTRA_LD_PRE) "18f2455_g.lkr"  -p$(MP_PROCESSOR_OPTION_LD)  -w -x -u_DEBUG   -z__MPLAB_BUILD=1  -u_CRUNTIME -z__MPLAB_DEBUG=1 -z__MPLAB_DEBUGGER_PICKIT2=1 $(MP_LINKER_DEBUG_OPTION) -l ${MP_CC_DIR}/../lib  -o dist/${CND_CONF}/${IMAGE_TYPE}/Badge.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}  ${OBJECTFILES_QUOTED_IF_SPACED}  obj/cdc.o obj/i2c_ack.o obj/i2c_clos.o obj/i2c_dtrd.o obj/i2c_eeap.o obj/i2c_eebw.o obj/i2c_eecr.o obj/i2c_eepw.o obj/i2c_eerr.o obj/i2c_eesr.o obj/i2c_gets.o obj/i2c_idle.o obj/i2c_nack.o obj/i2c_open.o obj/i2c_puts.o obj/i2c_read.o obj/i2c_rstr.o obj/i2c_stop.o obj/i2c_strt.o obj/i2c_writ.o obj/usb9.o obj/usbctrltrf.o obj/usbdrv.o obj/usbdsc.o obj/usbmmap.o 
+	${MP_LD} $(MP_EXTRA_LD_PRE) "18f2455_g.lkr"  -p$(MP_PROCESSOR_OPTION_LD)  -w -x -u_DEBUG   -z__MPLAB_BUILD=1  -u_CRUNTIME -z__MPLAB_DEBUG=1 -z__MPLAB_DEBUGGER_PK3=1 $(MP_LINKER_DEBUG_OPTION) -l ${MP_CC_DIR}/../lib  -o dist/${CND_CONF}/${IMAGE_TYPE}/Badge.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}  ${OBJECTFILES_QUOTED_IF_SPACED}  obj/cdc.o obj/i2c_ack.o obj/i2c_clos.o obj/i2c_dtrd.o obj/i2c_eeap.o obj/i2c_eebw.o obj/i2c_eecr.o obj/i2c_eepw.o obj/i2c_eerr.o obj/i2c_eesr.o obj/i2c_gets.o obj/i2c_idle.o obj/i2c_nack.o obj/i2c_open.o obj/i2c_puts.o obj/i2c_read.o obj/i2c_rstr.o obj/i2c_stop.o obj/i2c_strt.o obj/i2c_writ.o obj/usb9.o obj/usbctrltrf.o obj/usbdrv.o obj/usbdsc.o obj/usbmmap.o 
 else
 dist/${CND_CONF}/${IMAGE_TYPE}/Badge.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}: ${OBJECTFILES}  nbproject/Makefile-${CND_CONF}.mk  obj/cdc.o obj/i2c_ack.o obj/i2c_clos.o obj/i2c_dtrd.o obj/i2c_eeap.o obj/i2c_eebw.o obj/i2c_eecr.o obj/i2c_eepw.o obj/i2c_eerr.o obj/i2c_eesr.o obj/i2c_gets.o obj/i2c_idle.o obj/i2c_nack.o obj/i2c_open.o obj/i2c_puts.o obj/i2c_read.o obj/i2c_rstr.o obj/i2c_stop.o obj/i2c_strt.o obj/i2c_writ.o obj/usb9.o obj/usbctrltrf.o obj/usbdrv.o obj/usbdsc.o obj/usbmmap.o 18f2455_g.lkr
 	@${MKDIR} dist/${CND_CONF}/${IMAGE_TYPE} 

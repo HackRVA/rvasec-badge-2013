@@ -25,6 +25,7 @@
 #define IR_BIT_LENGTH_DIV2   ((IR_BIT_LENGTH / 2) - 0)
 #define IR_BIT_LENGTH_DIV4   ((IR_BIT_LENGTH / 4) - 0/2)
 
+//#define DEV
 #define accel_on
 #define base_station
 
@@ -35,6 +36,7 @@ unsigned char usbOn;
 extern volatile unsigned char int_tilt_count;
 extern struct event_buffer main_ev;
 extern unsigned char badge_id;
+unsigned char do_led_seq = 0x00;
 
 // global ram variables
 #pragma udata
@@ -96,7 +98,8 @@ volatile short timer1Counts = TIMER1HZ / TIMER1VAL ;
 unsigned char inputMode = 0x00;
 unsigned char do_callback = 0x00;
 void (*ir_callback)(unsigned char type, unsigned char data);
-
+unsigned short delayCount = 0;
+unsigned short iterator_count = 0;
 
 extern unsigned char irPayload_type;
 extern unsigned char irPayload_data;
@@ -565,7 +568,7 @@ static unsigned char usbCheck=0xFF;
 // the Init() code
 //
 unsigned char usbBusSense() {
-//#define DEV
+
 #ifdef DEV
     if (usbCheck == 0xFF) usbCheck = (PORTCbits.RC2 != 0);  // DEV version, usbCheck=1 (USB on), switch is not pressed/1
 #else
@@ -738,10 +741,15 @@ void ProcessIO(void)
     // checkCount should only be incremented once per loop
     // used to limit the number of times processes are done
     checkCount++;
+    if(inputMode)
+    {
+        if(do_led_seq)
+            led_seq_Cylon_NoSound();
 
+    }
     /* theramin */
     /* try not to check i2c too often */
-    if (!inputMode && theramin & ((checkCount % 64) == 0)) {
+    else if (!inputMode && theramin & ((checkCount % 64) == 0)) {
         // also do the led if enabled
         check_accel();
 
@@ -862,24 +870,36 @@ void doUSBOutput() {
         b = 0;
 
         if (inMenu == 1) {
-            byte i;
+            extern byte EEbyte, EEaddr;
 
-            output_buffer[b++] = 'I';
-            output_buffer[b++] = 'R';
+            output_buffer[b++] = 'E';
+            output_buffer[b++] = 'E';
+            output_buffer[b++] = ':';
+            hexDump(EEbyte, tmpbuf);
+            mymemcpy(&(output_buffer[b]), tmpbuf, 2);
             output_buffer[b++] = ' ';
 
-            for (i=0; i<4; i++) {
-                byte j;
-
-                binaryDump(IRbits[i], tmpbuf);
-                mymemcpy(&(output_buffer[b]), tmpbuf, 8);
-                b += 8;
-                output_buffer[b++] = ' ';
-            }
-
-            output_buffer[b++] = 10;
-            output_buffer[b++] = 13;
-            output_buffer[b++] = 0;
+            hexDump(EEaddr, tmpbuf);
+            mymemcpy(&(output_buffer[b]), tmpbuf, 2);
+            b += 2;
+//            byte i;
+//
+//            output_buffer[b++] = 'I';
+//            output_buffer[b++] = 'R';
+//            output_buffer[b++] = ' ';
+//
+//            for (i=0; i<4; i++) {
+//                byte j;
+//
+//                binaryDump(IRbits[i], tmpbuf);
+//                mymemcpy(&(output_buffer[b]), tmpbuf, 8);
+//                b += 8;
+//                output_buffer[b++] = ' ';
+//            }
+//
+//            output_buffer[b++] = 10;
+//            output_buffer[b++] = 13;
+//            output_buffer[b++] = 0;
         }
 
          if (inMenu == 2) {
@@ -1027,6 +1047,12 @@ void doUSBInput() {
             inputMode = 0x00;
         }
 
+        //turn on cylon Led
+        if(input_buffer[0] == '1')
+        {
+            do_led_seq ^= 0x01;
+        }
+
         //send cylon seek message
         if (input_buffer[0] == 'c') {
             //data indicates cylon stage
@@ -1102,6 +1128,21 @@ void doUSBInput() {
         if (input_buffer[0] == ' ')  {
             inMenu = 1;
         }
+
+        if (input_buffer[0] == '?')  {
+            extern void EEfetch(void);
+            extern void EEstore(void);
+            extern byte EEbyte, EEaddr;
+
+            EEbyte = 0;
+
+            EEaddr = 32; // read address 32
+            EEfetch();
+            EEbyte++;
+            EEstore();
+            inMenu = 1;
+        }
+
 
         // reset and dump info
         if (input_buffer[0] == 'r')  {
@@ -1270,6 +1311,150 @@ void doUSBInput() {
 
 }
 
+#define first_seq_up 0x1f
+#define second_seq_up 0x0E
+#define third_seq_up 0x04
+
+#define first_seq_down 0xf8
+#define second_seq_down 0x70
+#define third_seq_down 0x20
+
+#define cylon_speed 3
+void led_seq_Cylon_NoSound(void)
+{
+    //persistent state of the sequence
+    static unsigned char i = 0, j = 0;
+    short k = 0;
+
+    //count moving top to bottom
+    if(j < 12)
+    {
+        if(j < 4)
+        {
+            if(delayCount < 1)
+                set_leds((first_seq_up << j) >> 4);
+
+            else if(delayCount < 10 )
+                set_leds((second_seq_up << j) >> 4);
+
+            else if(delayCount < 40)
+                set_leds((third_seq_up << j) >> 4);
+
+            timer1Value = freq[7];
+            timer1Counts = TIMER1HZ / (4096 << 2);
+            PIE1bits.TMR1IE = 1;
+            T1CONbits.TMR1ON = 1;
+        }
+        else
+        {
+            if(delayCount < 1)
+                set_leds(first_seq_up << (j-4) );
+
+            else if(delayCount < 10 )
+                set_leds(second_seq_up << (j-4) );
+
+            else if(delayCount < 40)
+                set_leds(third_seq_up << (j-4) );
+
+            timer1Value = freq[9];
+            timer1Counts = TIMER1HZ / (4096 << 2);
+            PIE1bits.TMR1IE = 1;
+            T1CONbits.TMR1ON = 1;
+        }
+
+        delayCount++;
+
+        if(delayCount >= 40)
+        {
+            delayCount = 0;
+            iterator_count++;
+
+            if(iterator_count > cylon_speed)
+            {
+                iterator_count = 0;
+                j++;
+            }
+        }
+
+    }
+    //count moving bottom to top
+    else if (j < 24)
+    {
+        if(j < 16)
+        {
+            if(delayCount < 1)
+                set_leds((first_seq_down >> j - 12) << 4);
+
+            else if(delayCount < 10 )
+                set_leds((second_seq_down >> j- 12) << 4);
+
+            else if(delayCount < 40)
+                set_leds((third_seq_down >> j - 12) << 4);
+
+            timer1Value = freq[7];
+            timer1Counts = TIMER1HZ / (4096 << 2);
+            PIE1bits.TMR1IE = 1;
+            T1CONbits.TMR1ON = 1;
+        }
+        else
+        {
+             if(delayCount < 1)
+                set_leds(first_seq_down >> j - 16);
+
+
+             else if(delayCount < 10 )
+                set_leds(second_seq_down >> j - 16);
+
+
+             else if(delayCount < 40)
+                set_leds( third_seq_down >> j - 16);
+
+            timer1Value = freq[9];
+            timer1Counts = TIMER1HZ / (4096 << 2);
+            PIE1bits.TMR1IE = 1;
+            T1CONbits.TMR1ON = 1;
+        }
+
+
+        delayCount++;
+
+        if(delayCount >= 40)
+        {
+            delayCount = 0;
+            iterator_count++;
+
+            if(iterator_count > cylon_speed)
+            {
+                iterator_count = 0;
+                j++;
+            }
+        }
+    }
+    //one oscilation completed
+    else
+    {
+      j = 0;
+
+      //i counts number of repeats
+      i++;
+    }
+
+    //do it four times
+    if(i < 3)
+    {
+        //not done, run it again
+       enqueue(&main_ev, led_ev);
+    }
+    else
+    {
+        //shouldnt have to
+        //reset_globals();
+
+        i = j = k = 0; //all done
+        delayCount = 0;
+        set_leds(0x00);
+    }
+}
 
 // RC5 is 14 bits, not 16 so the top bit 28-31 are not transmitted
 // and will show up as an error, so this routine returns a 14 for RC5

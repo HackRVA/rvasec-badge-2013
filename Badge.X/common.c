@@ -17,15 +17,15 @@ extern unsigned char timer1Counts;
 #pragma code
 void irCB_gSpecialReq()
 {
-        ToggByte = (0b00100000 & data_gSpecial_peerCountReq) >> 5;
-        AddrByte = (0b00011111 & data_gSpecial_peerCountReq);
+    ToggByte = (0b00100000 & data_gSpecial_peerCountReq) >> 5;
+    AddrByte = (0b00011111 & data_gSpecial_peerCountReq);
 
-        DataByte = type_game_special << 2;
+    DataByte = type_game_special << 2;
 
-        //put the top two bits of the data at the 2 LSBs
-        DataByte |= (0b11000000 & data_gSpecial_peerCountReq)>>6;
+    //put the top two bits of the data at the 2 LSBs
+    DataByte |= (0b11000000 & data_gSpecial_peerCountReq)>>6;
 
-        SendRC5();
+    SendRC5();
 }
 
 void irCB_gSpecialResp(unsigned char data)
