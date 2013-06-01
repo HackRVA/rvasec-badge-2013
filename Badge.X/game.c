@@ -857,6 +857,13 @@ void Stage_PeerCount()
         }
         case(button_ev):
         {
+            //add led event
+            enqueue(&main_ev, led_ev);
+
+            led_seq = led_seq_sonar;
+
+            irCB_gSpecialReq();
+            
             break;
         }
         case(led_ev):
@@ -986,7 +993,7 @@ void Stage_GoL_Living()
             timer1Counts = TIMER1HZ / (timer1Value << 2);
             PIE1bits.TMR1IE = 1;
             T1CONbits.TMR1ON = 1;
-            hp -= 0x04;
+            hp -= 0x05;
             break;
         }
         case(tap_ev):
@@ -1066,18 +1073,18 @@ void Stage_GoL_Living()
             }
             else if(irPayload_type == type_GoL_L_hpTrade)
             {
-//                //set led event
-//                enqueue(&main_ev, led_ev);
-//
-//                led_seq = led_seq_sectionWin;
-//
-//                //check for overflow on health
-//                if( (255 - hp)<irPayload_data)
-//                    hp = 255;
-//                else
-//                    hp += irPayload_data;
-//
-//                green_leds = hp;
+                //set led event
+                enqueue(&main_ev, led_ev);
+
+                led_seq = led_seq_sectionWin;
+
+                //check for overflow on health
+                if( (255 - hp)<irPayload_data)
+                    hp = 255;
+                else
+                    hp += irPayload_data;
+
+                green_leds = hp;
             }
             else if(irPayload_type == type_game_special)
             {
