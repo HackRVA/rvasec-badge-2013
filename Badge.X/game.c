@@ -968,7 +968,7 @@ void Stage_GoL_Living()
             //enqueue(&main_ev, led_ev);
 
             //max health is 250 (start with a level badge for max health ;P)
-            hp = 50;//(hp_seed % (xA ^ yA)) + hp_seed;
+            hp = 60;//(hp_seed % (xA ^ yA)) + hp_seed;
             set_leds(0x00);
             store_stage(0x05);
             break;
@@ -981,12 +981,12 @@ void Stage_GoL_Living()
         case(shake_ev):
         {
             //attack (needs to be changed to button event)
-            irCB_GoLTrade(0x02);
+            irCB_GoLTrade(0x05);
             timer1Value = freq[25];
             timer1Counts = TIMER1HZ / (timer1Value << 2);
             PIE1bits.TMR1IE = 1;
             T1CONbits.TMR1ON = 1;
-            hp -= 0x02;
+            hp -= 0x04;
             break;
         }
         case(tap_ev):
@@ -1000,6 +1000,7 @@ void Stage_GoL_Living()
             timer1Counts = TIMER1HZ / (timer1Value << 2);
             PIE1bits.TMR1IE = 1;
             T1CONbits.TMR1ON = 1;
+            hp -= 5;
             break;
         }
         case(led_ev):
@@ -1181,6 +1182,8 @@ void Stage_GoL_Zombie()
             timer1Counts = TIMER1HZ / (timer1Value << 2);
             PIE1bits.TMR1IE = 1;
             T1CONbits.TMR1ON = 1;
+            if(iteratorCount < 2000)
+                iteratorCount += 200;
             break;
         }
         case(led_ev):
@@ -1199,10 +1202,10 @@ void Stage_GoL_Zombie()
 
                     led_seq = led_seq_death;
                 }
-                else
-                {
-                    iteratorCount -= 20;
-                }
+//                else
+//                {
+//                    iteratorCount -= 20;
+//                }
                 
             }
             else if(irPayload_type == type_GoL_Z_rally)
@@ -1219,14 +1222,18 @@ void Stage_GoL_Zombie()
             }
             else if(irPayload_type == type_game_special)
             {
-//                if(irPayload_data == data_gSpecial_virus)
-//                {
-//                    //set led event
-//                    enqueue(&main_ev, setup_ev);
-//
-//                    //current_stage = GoL_Zombie;
-//                    run_stage = Stage_GoL_Zombie;
-//                }
+                if(irPayload_data == data_gSpecial_cure)
+                {
+                    //set led event
+                    enqueue(&main_ev, setup_ev);
+
+                    //current_stage = GoL_Zombie;
+                    run_stage = Stage_GoL_Living;
+
+                    enqueue(&main_ev, led_ev);
+
+                    led_seq = led_seq_stageWin;
+                }
             }
 
             break;
