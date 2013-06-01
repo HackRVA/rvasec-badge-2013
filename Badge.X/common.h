@@ -33,6 +33,7 @@
 #define data_gSpecial_cylonHello 0x01
 #define data_gSpecial_peerCountReq 0x02
 #define data_gSpecial_virus 0x03
+#define data_gSpecial_cure 0x04
 
 #define zombie_life 0x01
 #define reg_life 0x02
@@ -94,6 +95,7 @@ void irCB_GoLFood(unsigned char amount);
 void irCB_GoLAttack(unsigned char amount);
 void irCB_GoLTrade(unsigned char amount);
 void irCB_GoLMutate();
+void irCB_GoLCure();
 void irCB_GoLRally(unsigned char amount);
 void irCB_GoL_Z_Attack(unsigned char amount);
 #endif	/* COMMON_H */

@@ -90,4 +90,7 @@ unsigned char check_peers(unsigned char id);
 void store_stage(unsigned char id);
 unsigned char read_stage();
 void read_set_stage();
+
+void store(unsigned char addr, unsigned char data);
+unsigned char fetch(unsigned char addr);
 #endif	/* GAME_H */

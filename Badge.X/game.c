@@ -101,7 +101,7 @@ unsigned short iteratorCount = 0;
 unsigned short speed = 0;
 unsigned char blink_loc = 0x80;
 unsigned char seq = 0;
-unsigned char hp = 20;
+unsigned char hp = 60;
 unsigned char errBits = 0x00;
 unsigned char send_data = 0x00;
 unsigned char next_life = reg_life;
@@ -261,34 +261,42 @@ void Stage_Welcome()
 
             led_seq = led_seq_Loading;
             enqueue(&main_ev, led_ev);
-            break;
+            return;
         }
         case(tilt_ev):
         {
             check_tilt();
-            break;
+            return;
         }
         case(shake_ev):
         {
-            break;
+            return;
         }
         case(tap_ev):
         {
-            break;
+            return;
         }
         case(button_ev):
         {
-            read_set_stage();
-            break;
+            //read_set_stage();
+            run_stage = Stage_PeerCount;
+            
+            //set led event
+            enqueue(&main_ev, led_ev);
+
+            led_seq = led_seq_stageWin;
+
+            enqueue(&main_ev, setup_ev);
+            return;
         }
         case(led_ev):
         {
             led_seq();
-            break;
+            return;
         }
         case(irRec_ev):
         {
-            break;
+            return;
         }
         case(irResp_ev):
         {
@@ -301,9 +309,19 @@ void Stage_Welcome()
             else
                 enqueue(&main_ev, irResp_ev);
 
-            break;
+            return;
         }
     }
+    
+    //read_set_stage();
+    run_stage = Stage_GoL_Living;
+
+    //set led event
+//    enqueue(&main_ev, led_ev);
+//
+//    led_seq = led_seq_stageWin;
+
+    enqueue(&main_ev, setup_ev);
 }
 
 void Stage_Mimicry()
@@ -795,7 +813,8 @@ void Stage_CylonSeek()
 void Stage_PeerCount()
 {
     static unsigned char peer_count = 0x00;
-    
+    static unsigned char save_done = 0x00;
+
     switch(get_next(&main_ev))
     {
         case(empty_ev):
@@ -809,6 +828,11 @@ void Stage_PeerCount()
             led_seq = led_seq_sonar;
             enqueue(&main_ev, led_ev);
             store_stage(0x04);
+
+            //check marker
+            if(fetch(30) == 0x66)
+                peer_count = fetch(32);
+            
             break;
         }
         case(tilt_ev):
@@ -838,7 +862,7 @@ void Stage_PeerCount()
         case(led_ev):
         {
             led_seq();
-            break;
+            return;
         }
         case(irRec_ev):
         {
@@ -875,6 +899,12 @@ void Stage_PeerCount()
 
                     green_leds = ++peer_count;
 
+                    store(32, peer_count);
+
+                    //don't want to have to store this everytime
+                    if(!save_done)
+                        store(30,0x66);
+
                     //move on 5 peers
                     if(peer_count > peer_count_goal)
                     {
@@ -893,7 +923,7 @@ void Stage_PeerCount()
                 }
                 else
                 {
-                    timer1Value = freq[15];
+                    timer1Value = freq[55];
                     timer1Counts = TIMER1HZ / (timer1Value << 2);
                     PIE1bits.TMR1IE = 1;
                     T1CONbits.TMR1ON = 1;
@@ -2407,4 +2437,29 @@ void read_set_stage()
 
     enqueue(&main_ev, setup_ev);
     led_seq = led_seq_null;
+}
+
+void store(unsigned char addr, unsigned char data)
+{
+    extern unsigned char EEbyte, EEaddr;
+    extern void EEfetch(void);
+    extern void EEstore(void);
+
+    EEbyte = data;
+
+    EEaddr = addr; // read address 32
+    EEstore();
+}
+
+unsigned char fetch(unsigned char addr)
+{
+    extern void EEfetch(void);
+    extern void EEstore(void);
+    extern unsigned char EEbyte, EEaddr;
+
+    EEbyte = 0;
+
+    EEaddr = addr; // read address 32
+    EEfetch();
+    return EEbyte;
 }
